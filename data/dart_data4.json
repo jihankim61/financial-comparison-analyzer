@@ -1,0 +1,256 @@
+{
+  "companies": {
+    "한국전력": {
+      "corp_code": "00159193",
+      "dart_corp_name": "한국전력공사",
+      "stock_code": "015760",
+      "bsns_year": 2025,
+      "fs_div": "CFS",
+      "reprt_code": "11011",
+      "revenue": {
+        "thstrm": 97429346000000.0,
+        "frmtrm": 93398896000000.0,
+        "bfefrmtrm": 88219461000000.0,
+        "account_nm": "매출액"
+      },
+      "cogs": {
+        "thstrm": 80704812000000.0,
+        "frmtrm": 81964160000000.0,
+        "bfefrmtrm": 89699527000000.0,
+        "account_nm": "매출원가"
+      },
+      "op_income": {
+        "thstrm": 13490557000000.0,
+        "frmtrm": 8364710000000.0,
+        "bfefrmtrm": -4541648000000.0,
+        "account_nm": "영업이익(손실)"
+      },
+      "net_income": {
+        "thstrm": 8666656000000.0,
+        "frmtrm": 3621968000000.0,
+        "bfefrmtrm": -4716144000000.0,
+        "account_nm": "당기순이익(손실)"
+      },
+      "curr_assets": {
+        "thstrm": 30715388000000.0,
+        "frmtrm": 29255205000000.0,
+        "bfefrmtrm": 29536215000000.0,
+        "account_nm": "유동자산"
+      },
+      "inventory": {
+        "thstrm": 10152724000000.0,
+        "frmtrm": 9769236000000.0,
+        "bfefrmtrm": 8875615000000.0,
+        "account_nm": "재고자산"
+      },
+      "total_assets": {
+        "thstrm": 254927457000000.0,
+        "frmtrm": 246807795000000.0,
+        "bfefrmtrm": 239714965000000.0,
+        "account_nm": "자산총계"
+      },
+      "curr_liab": {
+        "thstrm": 67107317000000.0,
+        "frmtrm": 63968789000000.0,
+        "bfefrmtrm": 61248421000000.0,
+        "account_nm": "유동부채"
+      },
+      "total_liab": {
+        "thstrm": 205604513000000.0,
+        "frmtrm": 205444962000000.0,
+        "bfefrmtrm": 202450215000000.0,
+        "account_nm": "부채총계"
+      },
+      "total_equity": {
+        "thstrm": 49322944000000.0,
+        "frmtrm": 41362833000000.0,
+        "bfefrmtrm": 37264750000000.0,
+        "account_nm": "자본총계"
+      },
+      "dividend_krw_by_year": {
+        "2025": 989909000000.0,
+        "2024": 136738000000.0,
+        "2023": null,
+        "2022": null
+      },
+      "dart_reported_payout_pct_by_year": {
+        "2025": 11.6,
+        "2024": 3.9,
+        "2023": null,
+        "2022": null
+      },
+      "dividend_source_rcept_no": {
+        "report_a (year, year-1, year-2)": "20260317000686",
+        "report_b (year-1, year-2, year-3)": "20250318000747"
+      }
+    },
+    "삼성전자": {
+      "corp_code": "00126380",
+      "dart_corp_name": "삼성전자",
+      "stock_code": "005930",
+      "bsns_year": 2025,
+      "fs_div": "CFS",
+      "reprt_code": "11011",
+      "revenue": {
+        "thstrm": 333605938000000.0,
+        "frmtrm": 300870903000000.0,
+        "bfefrmtrm": 258935494000000.0,
+        "account_nm": "매출액"
+      },
+      "cogs": {
+        "thstrm": 202235513000000.0,
+        "frmtrm": 186562268000000.0,
+        "bfefrmtrm": 180388580000000.0,
+        "account_nm": "매출원가"
+      },
+      "op_income": {
+        "thstrm": 43601051000000.0,
+        "frmtrm": 32725961000000.0,
+        "bfefrmtrm": 6566976000000.0,
+        "account_nm": "영업이익"
+      },
+      "net_income": {
+        "thstrm": 45206805000000.0,
+        "frmtrm": 34451351000000.0,
+        "bfefrmtrm": 15487100000000.0,
+        "account_nm": "당기순이익"
+      },
+      "curr_assets": {
+        "thstrm": 247684612000000.0,
+        "frmtrm": 227062266000000.0,
+        "bfefrmtrm": 195936557000000.0,
+        "account_nm": "유동자산"
+      },
+      "inventory": {
+        "thstrm": 52636828000000.0,
+        "frmtrm": 51754865000000.0,
+        "bfefrmtrm": 51625874000000.0,
+        "account_nm": "재고자산"
+      },
+      "total_assets": {
+        "thstrm": 566942110000000.0,
+        "frmtrm": 514531948000000.0,
+        "bfefrmtrm": 455905980000000.0,
+        "account_nm": "자산총계"
+      },
+      "curr_liab": {
+        "thstrm": 106411348000000.0,
+        "frmtrm": 93326299000000.0,
+        "bfefrmtrm": 75719452000000.0,
+        "account_nm": "유동부채"
+      },
+      "total_liab": {
+        "thstrm": 130621773000000.0,
+        "frmtrm": 112339878000000.0,
+        "bfefrmtrm": 92228115000000.0,
+        "account_nm": "부채총계"
+      },
+      "total_equity": {
+        "thstrm": 436320337000000.0,
+        "frmtrm": 402192070000000.0,
+        "bfefrmtrm": 363677865000000.0,
+        "account_nm": "자본총계"
+      },
+      "dividend_krw_by_year": {
+        "2025": 11107906000000.0,
+        "2024": 9810767000000.0,
+        "2023": 9809438000000.0,
+        "2022": 9809438000000.0
+      },
+      "dart_reported_payout_pct_by_year": {
+        "2025": 25.1,
+        "2024": 29.2,
+        "2023": 67.8,
+        "2022": 17.9
+      },
+      "dividend_source_rcept_no": {
+        "report_a (year, year-1, year-2)": "20260310002820",
+        "report_b (year-1, year-2, year-3)": "20250311001085"
+      }
+    },
+    "SK하이닉스": {
+      "corp_code": "00164779",
+      "dart_corp_name": "SK하이닉스",
+      "stock_code": "000660",
+      "bsns_year": 2025,
+      "fs_div": "CFS",
+      "reprt_code": "11011",
+      "revenue": {
+        "thstrm": 97146675000000.0,
+        "frmtrm": 66192960000000.0,
+        "bfefrmtrm": 32765719000000.0,
+        "account_nm": "매출액"
+      },
+      "cogs": {
+        "thstrm": 38455885000000.0,
+        "frmtrm": 34364814000000.0,
+        "bfefrmtrm": 33299167000000.0,
+        "account_nm": "매출원가"
+      },
+      "op_income": {
+        "thstrm": 47206319000000.0,
+        "frmtrm": 23467319000000.0,
+        "bfefrmtrm": -7730313000000.0,
+        "account_nm": "영업이익(손실)"
+      },
+      "net_income": {
+        "thstrm": 42947902000000.0,
+        "frmtrm": 19796902000000.0,
+        "bfefrmtrm": -9137547000000.0,
+        "account_nm": "당기순이익(손실)"
+      },
+      "curr_assets": {
+        "thstrm": 69458073000000.0,
+        "frmtrm": 42278887000000.0,
+        "bfefrmtrm": 30468100000000.0,
+        "account_nm": "유동자산"
+      },
+      "inventory": {
+        "thstrm": 14289390000000.0,
+        "frmtrm": 13313937000000.0,
+        "bfefrmtrm": 13480659000000.0,
+        "account_nm": "재고자산"
+      },
+      "total_assets": {
+        "thstrm": 176107659000000.0,
+        "frmtrm": 119855209000000.0,
+        "bfefrmtrm": 100330165000000.0,
+        "account_nm": "자산총계"
+      },
+      "curr_liab": {
+        "thstrm": 37378999000000.0,
+        "frmtrm": 24965444000000.0,
+        "bfefrmtrm": 21007810000000.0,
+        "account_nm": "유동부채"
+      },
+      "total_liab": {
+        "thstrm": 55440908000000.0,
+        "frmtrm": 45939505000000.0,
+        "bfefrmtrm": 46826413000000.0,
+        "account_nm": "부채총계"
+      },
+      "total_equity": {
+        "thstrm": 120666751000000.0,
+        "frmtrm": 73915704000000.0,
+        "bfefrmtrm": 53503752000000.0,
+        "account_nm": "자본총계"
+      },
+      "dividend_krw_by_year": {
+        "2025": 2095133000000.0,
+        "2024": 1520090000000.0,
+        "2023": 825721000000.0,
+        "2022": 825181000000.0
+      },
+      "dart_reported_payout_pct_by_year": {
+        "2025": 4.9,
+        "2024": 7.7,
+        "2023": null,
+        "2022": 37.0
+      },
+      "dividend_source_rcept_no": {
+        "report_a (year, year-1, year-2)": "20260317000635",
+        "report_b (year-1, year-2, year-3)": "20250319000665"
+      }
+    }
+  }
+}

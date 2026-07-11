@@ -1,0 +1,690 @@
+<title>재무비교분석기 PRD</title>
+<style>
+  :root {
+    --bg: #F5F6F8;
+    --surface: #FFFFFF;
+    --surface-raised: #FCFCFD;
+    --ink: #1A222D;
+    --ink-soft: #4B5563;
+    --muted: #6B7280;
+    --border: rgba(26,34,45,0.12);
+    --border-strong: rgba(26,34,45,0.22);
+    --accent: #1F5C6B;
+    --accent-soft: rgba(31,92,107,0.10);
+    --accent-strong: #143E48;
+    --gold: #A8791F;
+    --gold-soft: rgba(168,121,31,0.14);
+    --p0-fg: #8A2A35;
+    --p0-bg: rgba(138,42,53,0.10);
+    --p1-fg: #8A6413;
+    --p1-bg: rgba(168,121,31,0.14);
+    --p2-fg: #4B5568;
+    --p2-bg: rgba(75,85,104,0.10);
+    --status-done-fg: #1F6B4E;
+    --status-done-bg: rgba(31,107,78,0.12);
+    --code-bg: rgba(26,34,45,0.05);
+    --shadow: 0 1px 2px rgba(20,26,34,0.04), 0 8px 24px -12px rgba(20,26,34,0.10);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10141A;
+      --surface: #171D25;
+      --surface-raised: #1C232C;
+      --ink: #E7EAEE;
+      --ink-soft: #B7BFC9;
+      --muted: #8B95A3;
+      --border: rgba(231,234,238,0.12);
+      --border-strong: rgba(231,234,238,0.22);
+      --accent: #5FB8C9;
+      --accent-soft: rgba(95,184,201,0.14);
+      --accent-strong: #8FD3DF;
+      --gold: #D9A94A;
+      --gold-soft: rgba(217,169,74,0.16);
+      --p0-fg: #E9909A;
+      --p0-bg: rgba(233,144,154,0.14);
+      --p1-fg: #E3C374;
+      --p1-bg: rgba(227,195,116,0.14);
+      --p2-fg: #AEB7C4;
+      --p2-bg: rgba(174,183,196,0.12);
+      --status-done-fg: #7FCBAA;
+      --status-done-bg: rgba(127,203,170,0.14);
+      --code-bg: rgba(231,234,238,0.06);
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10141A; --surface: #171D25; --surface-raised: #1C232C;
+    --ink: #E7EAEE; --ink-soft: #B7BFC9; --muted: #8B95A3;
+    --border: rgba(231,234,238,0.12); --border-strong: rgba(231,234,238,0.22);
+    --accent: #5FB8C9; --accent-soft: rgba(95,184,201,0.14); --accent-strong: #8FD3DF;
+    --gold: #D9A94A; --gold-soft: rgba(217,169,74,0.16);
+    --p0-fg: #E9909A; --p0-bg: rgba(233,144,154,0.14);
+    --p1-fg: #E3C374; --p1-bg: rgba(227,195,116,0.14);
+    --p2-fg: #AEB7C4; --p2-bg: rgba(174,183,196,0.12);
+    --status-done-fg: #7FCBAA; --status-done-bg: rgba(127,203,170,0.14);
+    --code-bg: rgba(231,234,238,0.06);
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+  :root[data-theme="light"] {
+    --bg: #F5F6F8; --surface: #FFFFFF; --surface-raised: #FCFCFD;
+    --ink: #1A222D; --ink-soft: #4B5563; --muted: #6B7280;
+    --border: rgba(26,34,45,0.12); --border-strong: rgba(26,34,45,0.22);
+    --accent: #1F5C6B; --accent-soft: rgba(31,92,107,0.10); --accent-strong: #143E48;
+    --gold: #A8791F; --gold-soft: rgba(168,121,31,0.14);
+    --p0-fg: #8A2A35; --p0-bg: rgba(138,42,53,0.10);
+    --p1-fg: #8A6413; --p1-bg: rgba(168,121,31,0.14);
+    --p2-fg: #4B5568; --p2-bg: rgba(75,85,104,0.10);
+    --status-done-fg: #1F6B4E; --status-done-bg: rgba(31,107,78,0.12);
+    --code-bg: rgba(26,34,45,0.05);
+    --shadow: 0 1px 2px rgba(20,26,34,0.04), 0 8px 24px -12px rgba(20,26,34,0.10);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    line-height: 1.65;
+    font-size: 15.5px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mono {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  a { color: var(--accent); }
+
+  .page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 28px 96px;
+    display: grid;
+    grid-template-columns: 232px minmax(0, 1fr);
+    gap: 56px;
+  }
+  @media (max-width: 880px) {
+    .page { grid-template-columns: 1fr; gap: 28px; padding: 28px 18px 72px; }
+  }
+
+  /* ---------- Header ---------- */
+  .doc-header {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .eyebrow {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  h1.doc-title {
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+    color: var(--ink);
+  }
+  .doc-sub {
+    color: var(--ink-soft);
+    font-size: 16px;
+    max-width: 64ch;
+    margin: 0;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .meta-pill {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    font-size: 12.5px;
+  }
+  .meta-pill .k { color: var(--muted); font-family: "JetBrains Mono", monospace; letter-spacing: 0.03em; text-transform: uppercase; font-size: 10.5px; }
+  .meta-pill .v { color: var(--ink); font-weight: 600; }
+  .status-draft { color: var(--gold); border-color: var(--gold-soft); background: var(--gold-soft); }
+
+  /* ---------- TOC ---------- */
+  nav.toc {
+    position: sticky;
+    top: 32px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 13px;
+  }
+  @media (max-width: 880px) {
+    nav.toc {
+      position: static;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+  }
+  nav.toc a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 6px 8px;
+    border-radius: 5px;
+    display: flex;
+    gap: 8px;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  nav.toc a .num { font-family: "JetBrains Mono", monospace; color: var(--muted); font-size: 11.5px; min-width: 1.4em; }
+  nav.toc a:hover { background: var(--accent-soft); color: var(--ink); }
+  nav.toc a.active { background: var(--accent-soft); color: var(--accent-strong); font-weight: 600; }
+
+  /* ---------- Main content ---------- */
+  main { min-width: 0; }
+  section.doc-section {
+    max-width: 760px;
+    margin-bottom: 52px;
+    scroll-margin-top: 24px;
+  }
+  section.doc-section.wide { max-width: none; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .sec-num {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  h2.sec-title {
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h3.sub-title {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 22px 0 10px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  h3.sub-title .sec-num { font-size: 12.5px; }
+
+  p { color: var(--ink-soft); margin: 0 0 12px; }
+  strong { color: var(--ink); }
+
+  ul.plain, ol.plain { margin: 0 0 12px; padding-left: 1.15em; color: var(--ink-soft); }
+  ul.plain li, ol.plain li { margin-bottom: 5px; }
+
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 4px 0 18px;
+  }
+  .callout strong { color: var(--ink); }
+
+  /* ---------- Tables ---------- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 480px; }
+  thead th {
+    text-align: left;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border-strong);
+    background: var(--surface-raised);
+    white-space: nowrap;
+  }
+  tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--ink-soft); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td.strong-cell { color: var(--ink); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Priority chips ---------- */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .chip-p0 { color: var(--p0-fg); background: var(--p0-bg); }
+  .chip-p1 { color: var(--p1-fg); background: var(--p1-bg); }
+  .chip-p2 { color: var(--p2-fg); background: var(--p2-bg); }
+  .chip-done { color: var(--status-done-fg); background: var(--status-done-bg); }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin: 10px 0 16px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* ---------- Scope grid ---------- */
+  .scope-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 620px) { .scope-grid { grid-template-columns: 1fr; } }
+  .scope-card { border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; background: var(--surface); }
+  .scope-card.out { background: var(--surface-raised); }
+  .scope-card h4 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; font-family: "JetBrains Mono", monospace; }
+  .scope-card.in h4 { color: var(--status-done-fg); }
+  .scope-card.out h4 { color: var(--muted); }
+  .scope-card ul { margin: 0; padding-left: 1.1em; font-size: 13.5px; color: var(--ink-soft); }
+  .scope-card li { margin-bottom: 6px; }
+
+  /* ---------- Architecture diagram ---------- */
+  .arch-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 8px 0 6px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .arch-box {
+    flex: 1 1 0;
+    min-width: 148px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 14px 14px;
+    box-shadow: var(--shadow);
+  }
+  .arch-box .tag { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; display: block; }
+  .arch-box .name { font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 6px; }
+  .arch-box .desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .arch-arrow { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 34px; color: var(--muted); font-size: 18px; }
+  @media (max-width: 720px) {
+    .arch-flow { flex-direction: column; }
+    .arch-arrow { width: 100%; height: 24px; transform: rotate(90deg); }
+    .arch-box { min-width: 0; }
+  }
+
+  /* ---------- Roadmap ---------- */
+  .roadmap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .roadmap { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .roadmap { grid-template-columns: 1fr; } }
+  .phase-card { border: 1px solid var(--border); border-radius: 10px; background: var(--surface); padding: 16px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+  .phase-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 10px 10px 0 0; background: var(--border-strong); }
+  .phase-card.is-done::before { background: var(--status-done-fg); }
+  .phase-card.is-next::before { background: var(--accent); }
+  .phase-top { display: flex; justify-content: space-between; align-items: center; }
+  .phase-name { font-weight: 700; font-size: 14px; }
+  .phase-card ul { margin: 0; padding-left: 1.05em; font-size: 12.5px; color: var(--ink-soft); }
+  .phase-card li { margin-bottom: 5px; }
+
+  /* ---------- Data model ---------- */
+  code.field { font-family: "JetBrains Mono", monospace; background: var(--code-bg); border-radius: 4px; padding: 1px 5px; font-size: 12px; color: var(--ink); }
+
+  footer.doc-footer {
+    grid-column: 1 / -1;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12.5px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+
+<div class="page">
+  <header class="doc-header">
+    <span class="eyebrow">Product Requirements Document</span>
+    <h1 class="doc-title">재무비교분석기 — 국내 상장기업 재무제표 비교 웹 서비스</h1>
+    <p class="doc-sub">DART Open API 기반으로 회사명을 검색해 여러 기업의 재무제표와 핵심 비율을 비교하고, 결과를 엑셀로 내보낼 수 있는 도구를 현재의 스크립트 PoC에서 제품 단계로 발전시키기 위한 요구사항 정의서.</p>
+    <div class="meta-row">
+      <div class="meta-pill"><span class="k">Status</span><span class="v status-draft">Draft</span></div>
+      <div class="meta-pill"><span class="k">Version</span><span class="v mono">v0.1</span></div>
+      <div class="meta-pill"><span class="k">Updated</span><span class="v mono">2026-07-11</span></div>
+      <div class="meta-pill"><span class="k">Owner</span><span class="v">제품 기획 (미정)</span></div>
+      <div class="meta-pill"><span class="k">Source PoC</span><span class="v mono">dart_data.json · build_v2_stage3.py</span></div>
+    </div>
+  </header>
+
+  <nav class="toc" id="toc">
+    <a href="#background"><span class="num">01</span>배경 및 문제</a>
+    <a href="#goals"><span class="num">02</span>목표 및 성공지표</a>
+    <a href="#users"><span class="num">03</span>대상 사용자</a>
+    <a href="#scope"><span class="num">04</span>범위 정의</a>
+    <a href="#requirements"><span class="num">05</span>기능 요구사항</a>
+    <a href="#nfr"><span class="num">06</span>비기능 요구사항</a>
+    <a href="#architecture"><span class="num">07</span>시스템 아키텍처</a>
+    <a href="#data-model"><span class="num">08</span>데이터 모델</a>
+    <a href="#roadmap"><span class="num">09</span>로드맵</a>
+    <a href="#risks"><span class="num">10</span>리스크 · 미결정</a>
+    <a href="#appendix"><span class="num">11</span>부록</a>
+  </nav>
+
+  <main>
+    <section class="doc-section" id="background">
+      <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title">배경 및 문제 정의</h2></div>
+      <p>현재 재무비교분석기는 Python 스크립트 형태의 PoC로 존재한다. 사용자가 회사명을 코드에 직접 지정하면, DART Open API에서 corp_code를 조회하고 최신 사업보고서의 3개년 연결재무제표와 배당 공시를 가져와 엑셀 파일(원본데이터·비교분석·대시보드 3개 시트)로 산출한다. 지금까지 삼성전자·SK하이닉스·현대자동차, 그리고 한국전력·LG에너지솔루션·HD현대 조합으로 두 차례 수동 실행되었다.</p>
+      <p>이 방식의 한계는 다음과 같다.</p>
+      <ul class="plain">
+        <li>비교 대상 기업명을 바꿀 때마다 코드를 수정하고 재실행해야 하며, 결과 확인까지 개발자 개입이 필요하다.</li>
+        <li>비교 기업 수(3개)와 연도 수(3개년)가 스크립트에 고정되어 있어 유연한 비교가 불가능하다.</li>
+        <li>산출물이 매번 새 엑셀 파일로만 남아, 과거 비교 결과를 검색하거나 다시 열람하기 어렵다.</li>
+        <li>계정과목명이 기업마다 달라(예: "당기순이익" vs "연결당기순이익") 매칭 실패 가능성이 상존하지만, 이를 확인할 수 있는 화면이 없다.</li>
+      </ul>
+      <div class="callout"><strong>기회.</strong> 검색·비교·저장의 반복 작업을 웹 UI로 옮기면, 별도 코딩 지식 없이 개인 투자자나 주니어 애널리스트가 스스로 원하는 기업 조합을 비교할 수 있다.</div>
+    </section>
+
+    <section class="doc-section" id="goals">
+      <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title">목표 및 성공지표</h2></div>
+      <p><strong>제품 목표.</strong> 국내 상장기업의 재무제표를 회사명 검색만으로 비교하고, 결과를 신뢰할 수 있는 근거(출처·수식)와 함께 엑셀로 저장할 수 있는 셀프서비스 도구를 만든다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>지표</th><th>정의</th><th class="num">MVP 목표치</th></tr></thead>
+          <tbody>
+            <tr><td class="strong-cell">검색→비교 소요시간</td><td>회사명 입력부터 비교표 렌더링까지</td><td class="num">10초 이내</td></tr>
+            <tr><td class="strong-cell">동시 비교 기업 수</td><td>한 번의 비교 세션에 포함 가능한 기업 수</td><td class="num">최대 5개</td></tr>
+            <tr><td class="strong-cell">비교 가능 연도 수</td><td>사업보고서 기준 조회 가능 연도 범위</td><td class="num">최대 5개년</td></tr>
+            <tr><td class="strong-cell">엑셀 내보내기 성공률</td><td>수식 오류 없이 다운로드 완료되는 비율</td><td class="num">100%</td></tr>
+            <tr><td class="strong-cell">계정 매칭 실패 표기율</td><td>매칭 실패 시 "N/A" 및 사유가 노출되는 비율</td><td class="num">100%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="doc-section" id="users">
+      <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title">대상 사용자</h2></div>
+      <ul class="plain">
+        <li><strong>개인 투자자</strong> — 관심 종목과 동종업계 경쟁사의 수익성·안정성을 빠르게 대조하고 싶은 사용자.</li>
+        <li><strong>회계·재무 전공 학생 및 주니어 애널리스트</strong> — 재무비율 산출 근거를 학습하거나 리포트 초안 자료로 활용하려는 사용자.</li>
+        <li><strong>중소기업 재무 담당자</strong> — 동종업계 상장사와 자사 재무구조를 참고 비교하려는 사용자.</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" id="scope">
+      <div class="sec-head"><span class="sec-num">04</span><h2 class="sec-title">범위 정의</h2></div>
+      <p>1차 출시(MVP) 기준으로 아래와 같이 범위를 나눈다.</p>
+      <div class="scope-grid">
+        <div class="scope-card in">
+          <h4>In scope</h4>
+          <ul>
+            <li>국내 상장사 한글 회사명 검색</li>
+            <li>2~5개 기업 동시 비교</li>
+            <li>최근 최대 5개 사업연도 비교</li>
+            <li>수익성·안정성·성장성·배당 지표</li>
+            <li>추이 차트 및 요약 대시보드</li>
+            <li>수식 기반 엑셀 내보내기</li>
+            <li>데이터 출처(공시/연도/연결·별도) 표기</li>
+          </ul>
+        </div>
+        <div class="scope-card out">
+          <h4>Out of scope (1차)</h4>
+          <ul>
+            <li>해외 상장사 비교</li>
+            <li>실시간 시세·주가 연동</li>
+            <li>투자자문 또는 매수·매도 추천</li>
+            <li>모바일 네이티브 앱</li>
+            <li>회원가입/로그인, 비교 이력 클라우드 저장</li>
+            <li>업종 평균 벤치마크 (2차 검토)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section wide" id="requirements">
+      <div class="sec-head"><span class="sec-num">05</span><h2 class="sec-title">기능 요구사항</h2></div>
+      <div class="legend">
+        <span><span class="chip chip-p0">P0</span> 필수 — MVP 출시 조건</span>
+        <span><span class="chip chip-p1">P1</span> 우선 — 출시 직후 빠르게 추가</span>
+        <span><span class="chip chip-p2">P2</span> 검토 — 수요 확인 후 진행</span>
+      </div>
+
+      <h3 class="sub-title"><span class="sec-num">5.1</span>회사 검색</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th style="width:64px">우선순위</th><th>요구사항</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip chip-p0">P0</span></td><td>한글 회사명 입력 시 DART corpCode 캐시 기반 자동완성을 제공한다.</td></tr>
+            <tr><td><span class="chip chip-p0">P0</span></td><td>동일 회사명이 상장/비상장으로 중복될 경우 종목코드를 함께 노출해 구분한다 (예: 현재 스크립트의 <code class="field">find_corp_code</code> 로직 — 상장사 우선 선택).</td></tr>
+            <tr><td><span class="chip chip-p1">P1</span></td><td>최근 검색·비교 조합을 브라우저 로컬에 저장해 재사용을 돕는다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub-title"><span class="sec-num">5.2</span>비교 설정</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th style="width:64px">우선순위</th><th>요구사항</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip chip-p0">P0</span></td><td>2~5개 기업을 동시에 선택해 비교 세션을 구성할 수 있다.</td></tr>
+            <tr><td><span class="chip chip-p0">P0</span></td><td>최근 사업보고서를 기준으로 최대 5개년(현재는 3개년 고정) 데이터를 선택할 수 있다.</td></tr>
+            <tr><td><span class="chip chip-p1">P1</span></td><td>연결(CFS)/별도(OFS) 재무제표를 사용자가 직접 전환할 수 있다 (현재는 CFS→OFS 자동 폴백만 존재).</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub-title"><span class="sec-num">5.3</span>재무비율 엔진</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th style="width:64px">우선순위</th><th>지표군</th><th>세부 항목</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip chip-p0">P0</span></td><td class="strong-cell">수익성</td><td>매출총이익률 · 영업이익률 · 순이익률 · ROA · ROE</td></tr>
+            <tr><td><span class="chip chip-p0">P0</span></td><td class="strong-cell">안정성</td><td>부채비율 · 유동비율 · 자기자본비율</td></tr>
+            <tr><td><span class="chip chip-p0">P0</span></td><td class="strong-cell">성장성</td><td>전년대비 매출액 · 영업이익 · 순이익 · 총자산 증가율</td></tr>
+            <tr><td><span class="chip chip-p0">P0</span></td><td class="strong-cell">배당</td><td>배당성향 (현금배당금총액 ÷ 당기순이익)</td></tr>
+            <tr><td><span class="chip chip-p1">P1</span></td><td class="strong-cell">배당·활동성 확장</td><td>배당수익률(주가 연동 필요), 당좌비율, 총자산회전율</td></tr>
+            <tr><td><span class="chip chip-p2">P2</span></td><td class="strong-cell">벤치마크</td><td>업종 평균 대비 상대 위치 표시</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub-title"><span class="sec-num">5.4</span>시각화</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th style="width:64px">우선순위</th><th>요구사항</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip chip-p0">P0</span></td><td>매출액·영업이익·당기순이익 추이를 기업별 라인차트로 제공한다.</td></tr>
+            <tr><td><span class="chip chip-p0">P0</span></td><td>ROE·부채비율·배당성향 등 주요 비율을 기업별 막대 비교차트로 제공한다.</td></tr>
+            <tr><td><span class="chip chip-p1">P1</span></td><td>최신연도 요약 스코어카드에 조건부 서식(색상 스케일)을 적용해 한눈에 비교하게 한다.</td></tr>
+            <tr><td><span class="chip chip-p2">P2</span></td><td>다차원 지표를 레이더 차트로 동시에 비교하는 옵션을 제공한다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub-title"><span class="sec-num">5.5</span>내보내기 및 공유</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th style="width:64px">우선순위</th><th>요구사항</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip chip-p0">P0</span></td><td>현재 구조(원본데이터·비교분석·대시보드 시트, 수식 기반 계산)를 유지한 엑셀 다운로드를 제공한다.</td></tr>
+            <tr><td><span class="chip chip-p1">P1</span></td><td>PDF 요약 리포트를 다운로드할 수 있다.</td></tr>
+            <tr><td><span class="chip chip-p2">P2</span></td><td>읽기 전용 공유 링크로 비교 결과를 외부에 전달할 수 있다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="doc-section" id="nfr">
+      <div class="sec-head"><span class="sec-num">06</span><h2 class="sec-title">비기능 요구사항</h2></div>
+      <ul class="plain">
+        <li><strong>데이터 최신성</strong> — DART 공시 갱신에 맞춰 최소 1일 1회 재조회·캐시 갱신을 수행한다.</li>
+        <li><strong>API 레이트리밋 대응</strong> — DART Open API의 개인키 일일 호출 한도를 고려해 corp_code 목록과 재무데이터를 서버 사이드에 캐싱하고, 동일 기업·연도 재조회를 최소화한다.</li>
+        <li><strong>정확성과 투명성</strong> — 계정과목 매칭 실패 시 하드 에러 대신 "N/A"와 실패 사유를 노출한다 (현재 <code class="field">pick_item</code> 로직의 alias·substring 매칭 원칙 유지).</li>
+        <li><strong>성능</strong> — 캐시 히트 기준 비교 결과 렌더링 3초 이내.</li>
+        <li><strong>보안</strong> — DART API 키는 서버에만 보관하며 클라이언트로 노출하지 않는다.</li>
+      </ul>
+    </section>
+
+    <section class="doc-section wide" id="architecture">
+      <div class="sec-head"><span class="sec-num">07</span><h2 class="sec-title">시스템 아키텍처 (개략)</h2></div>
+      <p>현재 스크립트의 3단계(수집 → 계산 → 엑셀 저장) 흐름을 서버 캐시와 웹 프런트엔드로 확장한 구조.</p>
+      <div class="arch-flow">
+        <div class="arch-box">
+          <span class="tag">Source</span>
+          <div class="name">DART Open API</div>
+          <div class="desc">corpCode.xml · fnlttSinglAcntAll · alotMatter</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box">
+          <span class="tag">Ingestion</span>
+          <div class="name">캐시 · 수집 계층</div>
+          <div class="desc">기업코드·재무데이터 주기 수집 및 저장, 레이트리밋 관리</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box">
+          <span class="tag">Engine</span>
+          <div class="name">비율 계산 엔진</div>
+          <div class="desc">계정과목 매칭, 수익성·안정성·성장성·배당 산출</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box">
+          <span class="tag">Frontend</span>
+          <div class="name">검색 · 비교 웹 UI</div>
+          <div class="desc">회사 검색, 비교 세션 구성, 차트·대시보드</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box">
+          <span class="tag">Export</span>
+          <div class="name">엑셀 · PDF 생성</div>
+          <div class="desc">수식 기반 워크북, 요약 리포트</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" id="data-model">
+      <div class="sec-head"><span class="sec-num">08</span><h2 class="sec-title">데이터 모델 (핵심 엔티티)</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>엔티티</th><th>주요 필드</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr><td class="strong-cell">Company</td><td><code class="field">corp_code</code> <code class="field">corp_name</code> <code class="field">stock_code</code></td><td>DART corpCode.xml 기준 캐시</td></tr>
+            <tr><td class="strong-cell">FinancialPeriod</td><td><code class="field">bsns_year</code> <code class="field">fs_div</code> <code class="field">account_nm</code> <code class="field">amount</code></td><td>fnlttSinglAcntAll 응답 저장 단위</td></tr>
+            <tr><td class="strong-cell">DividendRecord</td><td><code class="field">bsns_year</code> <code class="field">cash_dividend_total</code></td><td>alotMatter 응답, 백만원→원 환산</td></tr>
+            <tr><td class="strong-cell">RatioSnapshot</td><td><code class="field">company_id</code> <code class="field">year</code> <code class="field">ratio_key</code> <code class="field">value</code></td><td>비율 엔진 산출 결과, 캐시 가능</td></tr>
+            <tr><td class="strong-cell">CompareSession</td><td><code class="field">company_ids[]</code> <code class="field">years[]</code></td><td>사용자의 비교 조합 (로그인 없이는 세션/로컬 저장)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="doc-section wide" id="roadmap">
+      <div class="sec-head"><span class="sec-num">09</span><h2 class="sec-title">로드맵</h2></div>
+      <div class="roadmap">
+        <div class="phase-card is-done">
+          <div class="phase-top"><span class="phase-name">Phase 0</span><span class="chip chip-done">완료</span></div>
+          <ul>
+            <li>Python 스크립트 PoC</li>
+            <li>회사명 하드코딩, 로컬 실행</li>
+            <li>수동 엑셀 산출 (3개사 · 3개년)</li>
+          </ul>
+        </div>
+        <div class="phase-card is-next">
+          <div class="phase-top"><span class="phase-name">Phase 1 · MVP</span><span class="chip chip-p0">P0</span></div>
+          <ul>
+            <li>회사 검색 웹 UI</li>
+            <li>2~5개사 비교, 최대 5개년</li>
+            <li>서버 캐싱 + 엑셀 내보내기</li>
+          </ul>
+        </div>
+        <div class="phase-card">
+          <div class="phase-top"><span class="phase-name">Phase 2</span><span class="chip chip-p1">P1</span></div>
+          <ul>
+            <li>PDF 요약 리포트</li>
+            <li>배당수익률 · 당좌비율 · 활동성 지표</li>
+            <li>업종 평균 벤치마크 검토</li>
+          </ul>
+        </div>
+        <div class="phase-card">
+          <div class="phase-top"><span class="phase-name">Phase 3</span><span class="chip chip-p2">P2</span></div>
+          <ul>
+            <li>읽기 전용 공유 링크</li>
+            <li>계정 · 즐겨찾기 · 이력 저장</li>
+            <li>해외 상장사 확장 여부 검토</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" id="risks">
+      <div class="sec-head"><span class="sec-num">10</span><h2 class="sec-title">리스크 및 미결정 사항</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>구분</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td class="strong-cell">데이터 매칭</td><td>계정과목명이 기업·업종별로 상이해(예: "당기순이익" vs "연결당기순이익") alias·substring 매칭이 완벽하지 않을 수 있음.</td></tr>
+            <tr><td class="strong-cell">배당 데이터 공백</td><td>alotMatter 응답의 전전기(bfefrmtrm) 필드가 일부 기업·연도에서 누락되는 사례 확인(HD현대 2023). 원인 조사 필요.</td></tr>
+            <tr><td class="strong-cell">API 호출 한도</td><td>무료 개인키의 일일 호출 한도 초과 시 대응 정책(대기열, 캐시 우선 제공 등) 미정.</td></tr>
+            <tr><td class="strong-cell">과금·인증 모델</td><td>개인용 무료 도구로 유지할지, 로그인·유료 티어를 둘지 미정.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="doc-section" id="appendix">
+      <div class="sec-head"><span class="sec-num">11</span><h2 class="sec-title">부록 — 현재 구현 참고</h2></div>
+      <p>Phase 0 PoC에서 사용된 스크립트 구성이다. Phase 1 설계 시 이 로직을 서버 모듈로 이관하는 것을 기본 방향으로 한다.</p>
+      <ul class="plain">
+        <li><code class="field">fetch_dart.py</code> / <code class="field">fetch_dart2.py</code> — corpCode 조회, fnlttSinglAcntAll·alotMatter 호출, alias 매칭</li>
+        <li><code class="field">build_dart_excel.py</code> 시리즈 — 원본데이터·비교분석·대시보드 시트 생성, 수식 기반 비율 계산</li>
+        <li><code class="field">dart_data.json</code> / <code class="field">dart_data2.json</code> — 수집된 원본 재무·배당 데이터 스냅샷</li>
+      </ul>
+    </section>
+
+    <footer class="doc-footer">
+      <span>재무비교분석기 PRD · v0.1 Draft</span>
+      <span>Phase 0 PoC 기준 작성 · 2026-07-11</span>
+    </footer>
+  </main>
+</div>
+
+<script>
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+    var sections = links.map(function (a) {
+      return document.getElementById(a.getAttribute('href').slice(1));
+    });
+    function onScroll() {
+      var pos = window.scrollY + 120;
+      var activeIdx = 0;
+      sections.forEach(function (sec, i) {
+        if (sec && sec.offsetTop <= pos) activeIdx = i;
+      });
+      links.forEach(function (a, i) {
+        a.classList.toggle('active', i === activeIdx);
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+</script>

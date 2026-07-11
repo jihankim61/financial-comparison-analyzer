@@ -1,0 +1,232 @@
+{
+  "companies": {
+    "한국전력": {
+      "corp_code": "00159193",
+      "dart_corp_name": "한국전력공사",
+      "stock_code": "015760",
+      "bsns_year": 2025,
+      "fs_div": "CFS",
+      "reprt_code": "11011",
+      "revenue": {
+        "thstrm": 97429346000000.0,
+        "frmtrm": 93398896000000.0,
+        "bfefrmtrm": 88219461000000.0,
+        "account_nm": "매출액"
+      },
+      "cogs": {
+        "thstrm": 80704812000000.0,
+        "frmtrm": 81964160000000.0,
+        "bfefrmtrm": 89699527000000.0,
+        "account_nm": "매출원가"
+      },
+      "op_income": {
+        "thstrm": 13490557000000.0,
+        "frmtrm": 8364710000000.0,
+        "bfefrmtrm": -4541648000000.0,
+        "account_nm": "영업이익(손실)"
+      },
+      "net_income": {
+        "thstrm": 8666656000000.0,
+        "frmtrm": 3621968000000.0,
+        "bfefrmtrm": -4716144000000.0,
+        "account_nm": "당기순이익(손실)"
+      },
+      "curr_assets": {
+        "thstrm": 30715388000000.0,
+        "frmtrm": 29255205000000.0,
+        "bfefrmtrm": 29536215000000.0,
+        "account_nm": "유동자산"
+      },
+      "inventory": {
+        "thstrm": 10152724000000.0,
+        "frmtrm": 9769236000000.0,
+        "bfefrmtrm": 8875615000000.0,
+        "account_nm": "재고자산"
+      },
+      "total_assets": {
+        "thstrm": 254927457000000.0,
+        "frmtrm": 246807795000000.0,
+        "bfefrmtrm": 239714965000000.0,
+        "account_nm": "자산총계"
+      },
+      "curr_liab": {
+        "thstrm": 67107317000000.0,
+        "frmtrm": 63968789000000.0,
+        "bfefrmtrm": 61248421000000.0,
+        "account_nm": "유동부채"
+      },
+      "total_liab": {
+        "thstrm": 205604513000000.0,
+        "frmtrm": 205444962000000.0,
+        "bfefrmtrm": 202450215000000.0,
+        "account_nm": "부채총계"
+      },
+      "total_equity": {
+        "thstrm": 49322944000000.0,
+        "frmtrm": 41362833000000.0,
+        "bfefrmtrm": 37264750000000.0,
+        "account_nm": "자본총계"
+      },
+      "dividend": {
+        "cash_dividend_total": {
+          "thstrm": 989909000000.0,
+          "frmtrm": 136738000000.0,
+          "bfefrmtrm": null,
+          "se": "현금배당금총액(백만원)"
+        }
+      }
+    },
+    "LG에너지솔루션": {
+      "corp_code": "01515323",
+      "dart_corp_name": "LG에너지솔루션",
+      "stock_code": "373220",
+      "bsns_year": 2025,
+      "fs_div": "CFS",
+      "reprt_code": "11011",
+      "revenue": {
+        "thstrm": 23671759000000.0,
+        "frmtrm": 25619585000000.0,
+        "bfefrmtrm": 33745470000000.0,
+        "account_nm": "매출액"
+      },
+      "cogs": {
+        "thstrm": 19439651000000.0,
+        "frmtrm": 22213605000000.0,
+        "bfefrmtrm": 28802437000000.0,
+        "account_nm": "매출원가"
+      },
+      "op_income": {
+        "thstrm": 1346120000000.0,
+        "frmtrm": 575387000000.0,
+        "bfefrmtrm": 2163234000000.0,
+        "account_nm": "영업이익"
+      },
+      "net_income": {
+        "thstrm": 80803000000.0,
+        "frmtrm": 338602000000.0,
+        "bfefrmtrm": 1637985000000.0,
+        "account_nm": "당기순이익(손실)"
+      },
+      "curr_assets": {
+        "thstrm": 18412127000000.0,
+        "frmtrm": 15327395000000.0,
+        "bfefrmtrm": 17208396000000.0,
+        "account_nm": "유동자산"
+      },
+      "inventory": {
+        "thstrm": 4350407000000.0,
+        "frmtrm": 4552355000000.0,
+        "bfefrmtrm": 5396336000000.0,
+        "account_nm": "재고자산"
+      },
+      "total_assets": {
+        "thstrm": 67147953000000.0,
+        "frmtrm": 60306791000000.0,
+        "bfefrmtrm": 45437144000000.0,
+        "account_nm": "자산총계"
+      },
+      "curr_liab": {
+        "thstrm": 16785357000000.0,
+        "frmtrm": 12054922000000.0,
+        "bfefrmtrm": 10937185000000.0,
+        "account_nm": "유동부채"
+      },
+      "total_liab": {
+        "thstrm": 37826277000000.0,
+        "frmtrm": 29340248000000.0,
+        "bfefrmtrm": 21063635000000.0,
+        "account_nm": "부채총계"
+      },
+      "total_equity": {
+        "thstrm": 29321676000000.0,
+        "frmtrm": 30966543000000.0,
+        "bfefrmtrm": 24373509000000.0,
+        "account_nm": "자본총계"
+      },
+      "dividend": {
+        "cash_dividend_total": {
+          "thstrm": null,
+          "frmtrm": null,
+          "bfefrmtrm": null,
+          "se": "현금배당금총액(백만원)"
+        }
+      }
+    },
+    "HD현대": {
+      "corp_code": "01205709",
+      "dart_corp_name": "HD현대",
+      "stock_code": "267250",
+      "bsns_year": 2025,
+      "fs_div": "CFS",
+      "reprt_code": "11011",
+      "revenue": {
+        "thstrm": 71259438270000.0,
+        "frmtrm": 67765626088000.0,
+        "bfefrmtrm": 61331302785000.0,
+        "account_nm": "매출액"
+      },
+      "cogs": {
+        "thstrm": 61203798281000.0,
+        "frmtrm": 61338721114000.0,
+        "bfefrmtrm": 56366042540000.0,
+        "account_nm": "매출원가"
+      },
+      "op_income": {
+        "thstrm": 6099636253000.0,
+        "frmtrm": 2983162778000.0,
+        "bfefrmtrm": 2031563587000.0,
+        "account_nm": "영업이익(손실)"
+      },
+      "net_income": {
+        "thstrm": 3675482625000.0,
+        "frmtrm": 1930179481000.0,
+        "bfefrmtrm": 785832206000.0,
+        "account_nm": "당기순이익(손실)"
+      },
+      "curr_assets": {
+        "thstrm": 39632675115000.0,
+        "frmtrm": 35592849734000.0,
+        "bfefrmtrm": 32083110520000.0,
+        "account_nm": "유동자산"
+      },
+      "inventory": {
+        "thstrm": 10225466549000.0,
+        "frmtrm": 10007110182000.0,
+        "bfefrmtrm": 9416327539000.0,
+        "account_nm": "유동재고자산"
+      },
+      "total_assets": {
+        "thstrm": 78685890494000.0,
+        "frmtrm": 73866670219000.0,
+        "bfefrmtrm": 67982820888000.0,
+        "account_nm": "자산총계"
+      },
+      "curr_liab": {
+        "thstrm": 33637107184000.0,
+        "frmtrm": 32333112202000.0,
+        "bfefrmtrm": 28532163119000.0,
+        "account_nm": "유동부채"
+      },
+      "total_liab": {
+        "thstrm": 48350799380000.0,
+        "frmtrm": 47481568074000.0,
+        "bfefrmtrm": 44750983788000.0,
+        "account_nm": "부채총계"
+      },
+      "total_equity": {
+        "thstrm": 30335091114000.0,
+        "frmtrm": 26385102145000.0,
+        "bfefrmtrm": 23231837100000.0,
+        "account_nm": "자본총계"
+      },
+      "dividend": {
+        "cash_dividend_total": {
+          "thstrm": 282674000000.0,
+          "frmtrm": 254406000000.0,
+          "bfefrmtrm": null,
+          "se": "현금배당금총액(백만원)"
+        }
+      }
+    }
+  }
+}

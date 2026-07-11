@@ -1,0 +1,232 @@
+{
+  "companies": {
+    "LG유플러스": {
+      "corp_code": "00231363",
+      "dart_corp_name": "LG유플러스",
+      "stock_code": "032640",
+      "bsns_year": 2025,
+      "fs_div": "CFS",
+      "reprt_code": "11011",
+      "revenue": {
+        "thstrm": 15451745000000.0,
+        "frmtrm": 14625198000000.0,
+        "bfefrmtrm": 14372626000000.0,
+        "account_nm": "영업수익"
+      },
+      "cogs": {
+        "thstrm": null,
+        "frmtrm": null,
+        "bfefrmtrm": null,
+        "account_nm": null
+      },
+      "op_income": {
+        "thstrm": 892131000000.0,
+        "frmtrm": 863130000000.0,
+        "bfefrmtrm": 998031000000.0,
+        "account_nm": "영업이익"
+      },
+      "net_income": {
+        "thstrm": 509226000000.0,
+        "frmtrm": 314602000000.0,
+        "bfefrmtrm": 630241000000.0,
+        "account_nm": "당기순이익"
+      },
+      "curr_assets": {
+        "thstrm": 5414363000000.0,
+        "frmtrm": 5263896000000.0,
+        "bfefrmtrm": 4964158000000.0,
+        "account_nm": "유동자산"
+      },
+      "inventory": {
+        "thstrm": 209832000000.0,
+        "frmtrm": 252311000000.0,
+        "bfefrmtrm": 354433000000.0,
+        "account_nm": "재고자산"
+      },
+      "total_assets": {
+        "thstrm": 19681792000000.0,
+        "frmtrm": 19707730000000.0,
+        "bfefrmtrm": 20100605000000.0,
+        "account_nm": "자산총계"
+      },
+      "curr_liab": {
+        "thstrm": 4676319000000.0,
+        "frmtrm": 5116288000000.0,
+        "bfefrmtrm": 5606861000000.0,
+        "account_nm": "유동부채"
+      },
+      "total_liab": {
+        "thstrm": 10614265000000.0,
+        "frmtrm": 10939351000000.0,
+        "bfefrmtrm": 11343820000000.0,
+        "account_nm": "부채총계"
+      },
+      "total_equity": {
+        "thstrm": 9067527000000.0,
+        "frmtrm": 8768379000000.0,
+        "bfefrmtrm": 8756785000000.0,
+        "account_nm": "자본총계"
+      },
+      "dividend": {
+        "cash_dividend_total": {
+          "thstrm": 281472000000.0,
+          "frmtrm": 279388000000.0,
+          "bfefrmtrm": null,
+          "se": "현금배당금총액(백만원)"
+        }
+      }
+    },
+    "HD현대": {
+      "corp_code": "01205709",
+      "dart_corp_name": "HD현대",
+      "stock_code": "267250",
+      "bsns_year": 2025,
+      "fs_div": "CFS",
+      "reprt_code": "11011",
+      "revenue": {
+        "thstrm": 71259438270000.0,
+        "frmtrm": 67765626088000.0,
+        "bfefrmtrm": 61331302785000.0,
+        "account_nm": "매출액"
+      },
+      "cogs": {
+        "thstrm": 61203798281000.0,
+        "frmtrm": 61338721114000.0,
+        "bfefrmtrm": 56366042540000.0,
+        "account_nm": "매출원가"
+      },
+      "op_income": {
+        "thstrm": 6099636253000.0,
+        "frmtrm": 2983162778000.0,
+        "bfefrmtrm": 2031563587000.0,
+        "account_nm": "영업이익(손실)"
+      },
+      "net_income": {
+        "thstrm": 3675482625000.0,
+        "frmtrm": 1930179481000.0,
+        "bfefrmtrm": 785832206000.0,
+        "account_nm": "당기순이익(손실)"
+      },
+      "curr_assets": {
+        "thstrm": 39632675115000.0,
+        "frmtrm": 35592849734000.0,
+        "bfefrmtrm": 32083110520000.0,
+        "account_nm": "유동자산"
+      },
+      "inventory": {
+        "thstrm": 10225466549000.0,
+        "frmtrm": 10007110182000.0,
+        "bfefrmtrm": 9416327539000.0,
+        "account_nm": "유동재고자산"
+      },
+      "total_assets": {
+        "thstrm": 78685890494000.0,
+        "frmtrm": 73866670219000.0,
+        "bfefrmtrm": 67982820888000.0,
+        "account_nm": "자산총계"
+      },
+      "curr_liab": {
+        "thstrm": 33637107184000.0,
+        "frmtrm": 32333112202000.0,
+        "bfefrmtrm": 28532163119000.0,
+        "account_nm": "유동부채"
+      },
+      "total_liab": {
+        "thstrm": 48350799380000.0,
+        "frmtrm": 47481568074000.0,
+        "bfefrmtrm": 44750983788000.0,
+        "account_nm": "부채총계"
+      },
+      "total_equity": {
+        "thstrm": 30335091114000.0,
+        "frmtrm": 26385102145000.0,
+        "bfefrmtrm": 23231837100000.0,
+        "account_nm": "자본총계"
+      },
+      "dividend": {
+        "cash_dividend_total": {
+          "thstrm": 282674000000.0,
+          "frmtrm": 254406000000.0,
+          "bfefrmtrm": null,
+          "se": "현금배당금총액(백만원)"
+        }
+      }
+    },
+    "셀트리온": {
+      "corp_code": "00413046",
+      "dart_corp_name": "셀트리온",
+      "stock_code": "068270",
+      "bsns_year": 2025,
+      "fs_div": "CFS",
+      "reprt_code": "11011",
+      "revenue": {
+        "thstrm": 4162495108881.0,
+        "frmtrm": 3557303554371.0,
+        "bfefrmtrm": 2176431531380.0,
+        "account_nm": "매출액"
+      },
+      "cogs": {
+        "thstrm": 1695467732345.0,
+        "frmtrm": 1875590283775.0,
+        "bfefrmtrm": 1124562480391.0,
+        "account_nm": "매출원가"
+      },
+      "op_income": {
+        "thstrm": 1168471345595.0,
+        "frmtrm": 492015534847.0,
+        "bfefrmtrm": 651481422157.0,
+        "account_nm": "영업이익"
+      },
+      "net_income": {
+        "thstrm": 1031483789240.0,
+        "frmtrm": 418883310404.0,
+        "bfefrmtrm": 539706505110.0,
+        "account_nm": "당기순이익"
+      },
+      "curr_assets": {
+        "thstrm": 6205267557980.0,
+        "frmtrm": 5584129149603.0,
+        "bfefrmtrm": 5094010887675.0,
+        "account_nm": "유동자산"
+      },
+      "inventory": {
+        "thstrm": 2803460062651.0,
+        "frmtrm": 2765942959864.0,
+        "bfefrmtrm": 3038708399955.0,
+        "account_nm": "재고자산"
+      },
+      "total_assets": {
+        "thstrm": 22334900189800.0,
+        "frmtrm": 21055222437706.0,
+        "bfefrmtrm": 19956813831274.0,
+        "account_nm": "자산총계"
+      },
+      "curr_liab": {
+        "thstrm": 4453815745874.0,
+        "frmtrm": 3187120605915.0,
+        "bfefrmtrm": 2512385333437.0,
+        "account_nm": "유동부채"
+      },
+      "total_liab": {
+        "thstrm": 4982370370686.0,
+        "frmtrm": 3475160069015.0,
+        "bfefrmtrm": 2831019524039.0,
+        "account_nm": "부채총계"
+      },
+      "total_equity": {
+        "thstrm": 17352529819114.0,
+        "frmtrm": 17580062368691.0,
+        "bfefrmtrm": 17125794307235.0,
+        "account_nm": "자본총계"
+      },
+      "dividend": {
+        "cash_dividend_total": {
+          "thstrm": 163960000000.0,
+          "frmtrm": 153773000000.0,
+          "bfefrmtrm": null,
+          "se": "현금배당금총액(백만원)"
+        }
+      }
+    }
+  }
+}

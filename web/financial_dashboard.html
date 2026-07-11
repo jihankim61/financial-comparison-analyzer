@@ -1,0 +1,623 @@
+<meta charset="UTF-8">
+<title>재무비교분석기 대시보드</title>
+<style>
+  :root {
+    --bg: #F5F6F8;
+    --surface: #FFFFFF;
+    --surface-raised: #FCFCFD;
+    --ink: #1A222D;
+    --ink-soft: #4B5563;
+    --muted: #6B7280;
+    --border: rgba(26,34,45,0.12);
+    --border-strong: rgba(26,34,45,0.22);
+    --accent: #1F5C6B;
+    --accent-soft: rgba(31,92,107,0.10);
+    --accent-strong: #143E48;
+    --gold: #A8791F;
+    --gold-soft: rgba(168,121,31,0.14);
+    --pos: #1F6B4E;
+    --pos-soft: rgba(31,107,78,0.12);
+    --neg: #B23A48;
+    --neg-soft: rgba(178,58,72,0.12);
+    --warn: #8A6413;
+    --warn-soft: rgba(168,121,31,0.14);
+    --chip-off-bg: rgba(75,85,104,0.08);
+    --chip-off-fg: var(--muted);
+    --shadow: 0 1px 2px rgba(20,26,34,0.04), 0 8px 24px -12px rgba(20,26,34,0.12);
+    --cat-1: #1F5C6B; --cat-2: #A8791F; --cat-3: #6E5A9E; --cat-4: #C1553D;
+    --cat-5: #3C7A5E; --cat-6: #4C6FA5; --cat-7: #9A5A7A; --cat-8: #7A7040;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10141A; --surface: #171D25; --surface-raised: #1C232C;
+      --ink: #E7EAEE; --ink-soft: #B7BFC9; --muted: #8B95A3;
+      --border: rgba(231,234,238,0.12); --border-strong: rgba(231,234,238,0.22);
+      --accent: #5FB8C9; --accent-soft: rgba(95,184,201,0.14); --accent-strong: #8FD3DF;
+      --gold: #D9A94A; --gold-soft: rgba(217,169,74,0.16);
+      --pos: #7FCBAA; --pos-soft: rgba(127,203,170,0.14);
+      --neg: #E9909A; --neg-soft: rgba(233,144,154,0.14);
+      --warn: #E3C374; --warn-soft: rgba(227,195,116,0.14);
+      --chip-off-bg: rgba(174,183,196,0.10); --chip-off-fg: var(--muted);
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+      --cat-1: #5FB8C9; --cat-2: #D9A94A; --cat-3: #A996D6; --cat-4: #E08A72;
+      --cat-5: #7FC7A3; --cat-6: #8AA8DC; --cat-7: #D08FAE; --cat-8: #C2B76B;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10141A; --surface: #171D25; --surface-raised: #1C232C;
+    --ink: #E7EAEE; --ink-soft: #B7BFC9; --muted: #8B95A3;
+    --border: rgba(231,234,238,0.12); --border-strong: rgba(231,234,238,0.22);
+    --accent: #5FB8C9; --accent-soft: rgba(95,184,201,0.14); --accent-strong: #8FD3DF;
+    --gold: #D9A94A; --gold-soft: rgba(217,169,74,0.16);
+    --pos: #7FCBAA; --pos-soft: rgba(127,203,170,0.14);
+    --neg: #E9909A; --neg-soft: rgba(233,144,154,0.14);
+    --warn: #E3C374; --warn-soft: rgba(227,195,116,0.14);
+    --chip-off-bg: rgba(174,183,196,0.10); --chip-off-fg: var(--muted);
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    --cat-1: #5FB8C9; --cat-2: #D9A94A; --cat-3: #A996D6; --cat-4: #E08A72;
+    --cat-5: #7FC7A3; --cat-6: #8AA8DC; --cat-7: #D08FAE; --cat-8: #C2B76B;
+  }
+  :root[data-theme="light"] {
+    --bg: #F5F6F8; --surface: #FFFFFF; --surface-raised: #FCFCFD;
+    --ink: #1A222D; --ink-soft: #4B5563; --muted: #6B7280;
+    --border: rgba(26,34,45,0.12); --border-strong: rgba(26,34,45,0.22);
+    --accent: #1F5C6B; --accent-soft: rgba(31,92,107,0.10); --accent-strong: #143E48;
+    --gold: #A8791F; --gold-soft: rgba(168,121,31,0.14);
+    --pos: #1F6B4E; --pos-soft: rgba(31,107,78,0.12);
+    --neg: #B23A48; --neg-soft: rgba(178,58,72,0.12);
+    --warn: #8A6413; --warn-soft: rgba(168,121,31,0.14);
+    --chip-off-bg: rgba(75,85,104,0.08); --chip-off-fg: var(--muted);
+    --shadow: 0 1px 2px rgba(20,26,34,0.04), 0 8px 24px -12px rgba(20,26,34,0.12);
+    --cat-1: #1F5C6B; --cat-2: #A8791F; --cat-3: #6E5A9E; --cat-4: #C1553D;
+    --cat-5: #3C7A5E; --cat-6: #4C6FA5; --cat-7: #9A5A7A; --cat-8: #7A7040;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    font-size: 14.5px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 24px 20px 64px; }
+
+  /* header */
+  .dash-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+  .dash-title { font-size: 21px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .dash-sub { color: var(--muted); font-size: 12.5px; margin: 0; }
+  .source-badge { display: flex; align-items: center; gap: 6px; font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; background: var(--surface); white-space: nowrap; }
+  .source-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pos); flex: none; }
+
+  /* company selector */
+  .selector-panel { margin-bottom: 20px; padding: 14px 14px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .selector-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-family: "JetBrains Mono", monospace; margin-right: 4px; white-space: nowrap; }
+
+  .search-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .search-input-wrap { position: relative; flex: 1; max-width: 380px; }
+  .search-input { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface-raised); color: var(--ink); font-size: 13px; font-family: inherit; }
+  .search-input:focus-visible, .search-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .search-hint { font-size: 11.5px; color: var(--muted); }
+  .search-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 10px; box-shadow: var(--shadow); z-index: 30; max-height: 220px; overflow-y: auto; }
+  .search-item { padding: 8px 12px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--ink); }
+  .search-item .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .search-item:hover, .search-item.hl { background: var(--accent-soft); }
+  .search-item.disabled { opacity: 0.4; cursor: not-allowed; }
+  .search-empty { padding: 10px 12px; font-size: 12.5px; color: var(--muted); }
+
+  .chip-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .chip-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border-strong); background: var(--chip-off-bg); color: var(--chip-off-fg); font-size: 13px; font-weight: 600; cursor: pointer; user-select: none; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
+  .chip-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .chip-toggle .dot { width: 9px; height: 9px; border-radius: 50%; background: currentColor; opacity: 0.35; }
+  .chip-toggle.active { background: var(--dot-color, var(--accent)); color: #fff; border-color: transparent; }
+  .chip-toggle.active .dot { background: #fff; opacity: 1; }
+  .chip-toggle:disabled { opacity: 0.35; cursor: not-allowed; }
+  .selector-count { margin-left: auto; font-size: 12px; color: var(--muted); font-family: "JetBrains Mono", monospace; }
+
+  /* KPI cards */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); border-top: 3px solid var(--dot-color); }
+  .kpi-name { font-weight: 700; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .kpi-name .swatch { width: 9px; height: 9px; border-radius: 50%; background: var(--dot-color); flex: none; }
+  .kpi-rows { display: flex; flex-direction: column; gap: 5px; }
+  .kpi-row { display: flex; justify-content: space-between; font-size: 12.5px; }
+  .kpi-row .k { color: var(--muted); }
+  .kpi-row .v { font-family: "JetBrains Mono", monospace; font-weight: 600; }
+  .v.pos { color: var(--pos); }
+  .v.neg { color: var(--neg); }
+  .tax-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 20px; font-family: "JetBrains Mono", monospace; margin-top: 8px; }
+  .tax-yes { background: var(--pos-soft); color: var(--pos); }
+  .tax-no { background: var(--neg-soft); color: var(--neg); }
+  .tax-unknown { background: var(--chip-off-bg); color: var(--muted); }
+
+  /* section headers */
+  .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-family: "JetBrains Mono", monospace; margin: 28px 0 10px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+  /* charts */
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px 10px; box-shadow: var(--shadow); }
+  .chart-card h3 { margin: 0 0 8px; font-size: 13.5px; font-weight: 700; }
+  .chart-card canvas { width: 100%; display: block; }
+  .legend-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; font-size: 11px; color: var(--ink-soft); }
+  .legend-row span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend-row i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+  /* ratio bars */
+  .bar-list { display: flex; flex-direction: column; gap: 10px; }
+  .bar-item { display: grid; grid-template-columns: 96px 1fr 56px; align-items: center; gap: 10px; font-size: 12px; }
+  .bar-item .label { color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { height: 10px; background: var(--surface-raised); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 6px 0 0 6px; }
+  .bar-val { text-align: right; font-family: "JetBrains Mono", monospace; font-weight: 600; }
+
+  /* scorecard table */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 720px; }
+  thead th { text-align: left; font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--border-strong); background: var(--surface-raised); white-space: nowrap; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--ink-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.name-cell { font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+  td.name-cell .swatch { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: "JetBrains Mono", monospace; }
+
+  footer.dash-footer { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 11.5px; line-height: 1.7; }
+  footer.dash-footer strong { color: var(--ink-soft); }
+
+  @media (max-width: 640px) {
+    .bar-item { grid-template-columns: 72px 1fr 48px; }
+  }
+</style>
+
+<div class="wrap">
+  <div class="dash-header">
+    <div>
+      <h1 class="dash-title">재무비교분석기 대시보드</h1>
+      <p class="dash-sub">DART Open API 기준 국내 상장기업 재무제표 실데이터 · 회사를 선택해 비교하세요 (최대 5개)</p>
+    </div>
+    <div class="source-badge"><span class="source-dot"></span>DART 최신 사업보고서 · 스냅샷 2026-07-11</div>
+  </div>
+
+  <div class="selector-panel">
+    <div class="search-row">
+      <span class="selector-label">회사 검색</span>
+      <div class="search-input-wrap">
+        <input type="text" id="companySearch" class="search-input" placeholder="회사명을 입력하세요 (예: 삼성전자)" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" />
+        <div class="search-dropdown" id="searchDropdown" hidden></div>
+      </div>
+      <span class="search-hint">입력 후 Enter 또는 클릭으로 추가</span>
+    </div>
+    <div class="chip-row" id="selectorBar">
+      <span class="selector-label">빠른 선택</span>
+      <span class="selector-count" id="selCount"></span>
+    </div>
+  </div>
+
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <div class="section-title">추이 (3개년)</div>
+  <div class="chart-grid">
+    <div class="chart-card"><h3>매출액 (원)</h3><canvas id="chartRevenue" height="170"></canvas><div class="legend-row" id="legendRevenue"></div></div>
+    <div class="chart-card"><h3>영업이익 (원)</h3><canvas id="chartOpIncome" height="170"></canvas><div class="legend-row" id="legendOpIncome"></div></div>
+    <div class="chart-card"><h3>당기순이익 (원)</h3><canvas id="chartNetIncome" height="170"></canvas><div class="legend-row" id="legendNetIncome"></div></div>
+  </div>
+
+  <div class="section-title">최신연도 비율 비교</div>
+  <div class="chart-grid">
+    <div class="chart-card"><h3>ROE (자기자본순이익률)</h3><div class="bar-list" id="barROE"></div></div>
+    <div class="chart-card"><h3>부채비율</h3><div class="bar-list" id="barDebt"></div></div>
+    <div class="chart-card"><h3>영업이익률</h3><div class="bar-list" id="barOpMargin"></div></div>
+  </div>
+
+  <div class="section-title">요약 스코어카드</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>회사명</th><th class="num">매출액</th><th class="num">영업이익률</th><th class="num">순이익률</th>
+          <th class="num">ROE</th><th class="num">부채비율</th><th class="num">유동비율</th><th class="num">매출증가율</th><th>분리과세 대상</th>
+        </tr>
+      </thead>
+      <tbody id="scoreBody"></tbody>
+    </table>
+  </div>
+
+  <footer class="dash-footer">
+    <strong>데이터 출처.</strong> 금융감독원 전자공시시스템(DART) Open API — 각 기업 최신 사업보고서 기준 연결재무제표(미제출 시 별도). 비율은 원본 수치로부터 이 페이지에서 실시간 계산합니다.<br>
+    <strong>분리과세 판정.</strong> 2025년 세제개편안(조세특례제한법 §91의19, 2026.1.1 시행 예정) 관련 보도를 근거로 한 추정치이며, 삼성전자·SK하이닉스·한국전력 3개사만 확인했습니다. 확정 법령이 아니므로 실제 신고 전 국세청·세무전문가 확인이 필요합니다.<br>
+    <strong>표기.</strong> 값이 없거나 계정과목 매칭에 실패한 경우 <span class="mono">N/A</span>로 표시됩니다.
+  </footer>
+</div>
+
+<script>
+(function () {
+  // ---- raw data (DART Open API, 원 단위) ----
+  const DATA = {
+    "삼성전자": { years: [2023,2024,2025],
+      revenue:[258935494000000,300870903000000,333605938000000],
+      opIncome:[6566976000000,32725961000000,43601051000000],
+      netIncome:[15487100000000,34451351000000,45206805000000],
+      totalAssets:[455905980000000,514531948000000,566942110000000],
+      totalLiab:[92228115000000,112339878000000,130621773000000],
+      totalEquity:[363677865000000,402192070000000,436320337000000],
+      currAssets:[195936557000000,227062266000000,247684612000000],
+      currLiab:[75719452000000,93326299000000,106411348000000],
+      tax: {status:"yes", detail:"배당성향 25.1% · 3년평균 대비 +13.2%"} },
+    "SK하이닉스": { years:[2023,2024,2025],
+      revenue:[32765719000000,66192960000000,97146675000000],
+      opIncome:[-7730313000000,23467319000000,47206319000000],
+      netIncome:[-9137547000000,19796902000000,42947902000000],
+      totalAssets:[100330165000000,119855209000000,176107659000000],
+      totalLiab:[46826413000000,45939505000000,55440908000000],
+      totalEquity:[53503752000000,73915704000000,120666751000000],
+      currAssets:[30468100000000,42278887000000,69458073000000],
+      currLiab:[21007810000000,24965444000000,37378999000000],
+      tax: {status:"no", detail:"배당성향 4.9% (25% 미만)"} },
+    "현대자동차": { years:[2023,2024,2025],
+      revenue:[162663579000000,175231153000000,186254472000000],
+      opIncome:[15126901000000,14239592000000,11467851000000],
+      netIncome:[12272301000000,13229908000000,10364775000000],
+      totalAssets:[282463355000000,339798429000000,368844849000000],
+      totalLiab:[180653915000000,219522496000000,241196612000000],
+      totalEquity:[101809440000000,120275933000000,127648237000000],
+      currAssets:[101724717000000,115764287000000,120777363000000],
+      currLiab:[73362103000000,79509643000000,88579290000000],
+      tax: {status:"unknown"} },
+    "한국전력": { years:[2023,2024,2025],
+      revenue:[88219461000000,93398896000000,97429346000000],
+      opIncome:[-4541648000000,8364710000000,13490557000000],
+      netIncome:[-4716144000000,3621968000000,8666656000000],
+      totalAssets:[239714965000000,246807795000000,254927457000000],
+      totalLiab:[202450215000000,205444962000000,205604513000000],
+      totalEquity:[37264750000000,41362833000000,49322944000000],
+      currAssets:[29536215000000,29255205000000,30715388000000],
+      currLiab:[61248421000000,63968789000000,67107317000000],
+      tax: {status:"no", detail:"배당성향 11.6% (25% 미만)"} },
+    "LG에너지솔루션": { years:[2023,2024,2025],
+      revenue:[33745470000000,25619585000000,23671759000000],
+      opIncome:[2163234000000,575387000000,1346120000000],
+      netIncome:[1637985000000,338602000000,80803000000],
+      totalAssets:[45437144000000,60306791000000,67147953000000],
+      totalLiab:[21063635000000,29340248000000,37826277000000],
+      totalEquity:[24373509000000,30966543000000,29321676000000],
+      currAssets:[17208396000000,15327395000000,18412127000000],
+      currLiab:[10937185000000,12054922000000,16785357000000],
+      tax: {status:"unknown", detail:"배당 이력 없음"} },
+    "HD현대": { years:[2023,2024,2025],
+      revenue:[61331302785000,67765626088000,71259438270000],
+      opIncome:[2031563587000,2983162778000,6099636253000],
+      netIncome:[785832206000,1930179481000,3675482625000],
+      totalAssets:[67982820888000,73866670219000,78685890494000],
+      totalLiab:[44750983788000,47481568074000,48350799380000],
+      totalEquity:[23231837100000,26385102145000,30335091114000],
+      currAssets:[32083110520000,35592849734000,39632675115000],
+      currLiab:[28532163119000,32333112202000,33637107184000],
+      tax: {status:"unknown"} },
+    "LG유플러스": { years:[2023,2024,2025],
+      revenue:[14372626000000,14625198000000,15451745000000],
+      opIncome:[998031000000,863130000000,892131000000],
+      netIncome:[630241000000,314602000000,509226000000],
+      totalAssets:[20100605000000,19707730000000,19681792000000],
+      totalLiab:[11343820000000,10939351000000,10614265000000],
+      totalEquity:[8756785000000,8768379000000,9067527000000],
+      currAssets:[4964158000000,5263896000000,5414363000000],
+      currLiab:[5606861000000,5116288000000,4676319000000],
+      tax: {status:"unknown"} },
+    "셀트리온": { years:[2023,2024,2025],
+      revenue:[2176431531380,3557303554371,4162495108881],
+      opIncome:[651481422157,492015534847,1168471345595],
+      netIncome:[539706505110,418883310404,1031483789240],
+      totalAssets:[19956813831274,21055222437706,22334900189800],
+      totalLiab:[2831019524039,3475160069015,4982370370686],
+      totalEquity:[17125794307235,17580062368691,17352529819114],
+      currAssets:[5094010887675,5584129149603,6205267557980],
+      currLiab:[2512385333437,3187120605915,4453815745874],
+      tax: {status:"unknown"} },
+  };
+  const ORDER = Object.keys(DATA);
+  const MAX_SELECT = 5;
+  const catVar = (i) => `var(--cat-${(i % 8) + 1})`;
+  ORDER.forEach((name, i) => DATA[name]._color = catVar(i));
+
+  let selected = ["삼성전자", "SK하이닉스", "한국전력"];
+
+  // ---- helpers ----
+  const fmtWon = (v) => {
+    if (v === null || v === undefined || isNaN(v)) return "N/A";
+    const trillion = 1e12, hundredMil = 1e8;
+    if (Math.abs(v) >= trillion) return (v / trillion).toFixed(1) + "조";
+    return (v / hundredMil).toFixed(0) + "억";
+  };
+  const fmtPct = (v) => (v === null || v === undefined || isNaN(v)) ? "N/A" : (v * 100).toFixed(1) + "%";
+  const last = (arr) => arr[arr.length - 1];
+  const prev = (arr) => arr[arr.length - 2];
+
+  function ratios(d) {
+    const rev = last(d.revenue), op = last(d.opIncome), ni = last(d.netIncome);
+    const ta = last(d.totalAssets), tl = last(d.totalLiab), te = last(d.totalEquity);
+    const ca = last(d.currAssets), cl = last(d.currLiab);
+    const prevRev = prev(d.revenue);
+    return {
+      opMargin: op / rev, netMargin: ni / rev, roe: ni / te, roa: ni / ta,
+      debtRatio: tl / te, currentRatio: ca / cl,
+      revGrowth: prevRev ? (rev - prevRev) / prevRev : null,
+    };
+  }
+
+  // ---- selector chips ----
+  const bar = document.getElementById("selectorBar");
+  const countEl = document.getElementById("selCount");
+  function toggleCompany(name) {
+    if (selected.includes(name)) {
+      selected = selected.filter((n) => n !== name);
+    } else if (selected.length < MAX_SELECT) {
+      selected.push(name);
+    }
+    renderAll();
+  }
+  function renderSelector() {
+    bar.querySelectorAll(".chip-toggle").forEach((el) => el.remove());
+    ORDER.forEach((name) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip-toggle" + (selected.includes(name) ? " active" : "");
+      chip.style.setProperty("--dot-color", DATA[name]._color);
+      chip.innerHTML = `<span class="dot"></span>${name}`;
+      chip.disabled = !selected.includes(name) && selected.length >= MAX_SELECT;
+      chip.addEventListener("click", () => toggleCompany(name));
+      bar.appendChild(chip);
+    });
+    bar.appendChild(countEl);
+    countEl.textContent = `${selected.length} / ${MAX_SELECT} 선택됨`;
+  }
+
+  // ---- search / direct text entry ----
+  const searchInput = document.getElementById("companySearch");
+  const dropdown = document.getElementById("searchDropdown");
+  let hlIndex = -1;
+
+  function matchCompanies(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return ORDER.filter((name) => name.toLowerCase().includes(q));
+  }
+
+  function addCompany(name) {
+    if (!DATA[name] || selected.includes(name) || selected.length >= MAX_SELECT) return;
+    selected.push(name);
+    searchInput.value = "";
+    hlIndex = -1;
+    closeDropdown();
+    renderAll();
+    searchInput.focus();
+  }
+
+  function closeDropdown() {
+    dropdown.hidden = true;
+    searchInput.setAttribute("aria-expanded", "false");
+  }
+
+  function renderDropdown(query) {
+    const results = matchCompanies(query);
+    dropdown.innerHTML = "";
+    if (!query.trim()) { closeDropdown(); return; }
+    if (results.length === 0) {
+      const div = document.createElement("div");
+      div.className = "search-empty";
+      div.textContent = "일치하는 기업이 없습니다 (현재 8개 기업 데이터만 지원)";
+      dropdown.appendChild(div);
+      dropdown.hidden = false;
+      searchInput.setAttribute("aria-expanded", "true");
+      return;
+    }
+    results.forEach((name, i) => {
+      const already = selected.includes(name);
+      const full = !already && selected.length >= MAX_SELECT;
+      const item = document.createElement("div");
+      item.className = "search-item" + (already || full ? " disabled" : "") + (i === hlIndex ? " hl" : "");
+      item.setAttribute("role", "option");
+      item.innerHTML = `<span class="dot" style="background:${DATA[name]._color}"></span>${name}${already ? " · 선택됨" : ""}`;
+      item.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        if (already || full) return;
+        addCompany(name);
+      });
+      dropdown.appendChild(item);
+    });
+    dropdown.hidden = false;
+    searchInput.setAttribute("aria-expanded", "true");
+  }
+
+  searchInput.addEventListener("input", () => { hlIndex = -1; renderDropdown(searchInput.value); });
+  searchInput.addEventListener("focus", () => { if (searchInput.value.trim()) renderDropdown(searchInput.value); });
+  searchInput.addEventListener("keydown", (e) => {
+    const results = matchCompanies(searchInput.value);
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (results.length) { hlIndex = Math.min(hlIndex + 1, results.length - 1); renderDropdown(searchInput.value); }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (results.length) { hlIndex = Math.max(hlIndex - 1, 0); renderDropdown(searchInput.value); }
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const pick = results[hlIndex] ?? results[0];
+      if (pick) addCompany(pick);
+    } else if (e.key === "Escape") {
+      closeDropdown();
+    }
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".search-input-wrap")) closeDropdown();
+  });
+
+  // ---- KPI cards ----
+  function renderKpi() {
+    const grid = document.getElementById("kpiGrid");
+    grid.innerHTML = "";
+    selected.forEach((name) => {
+      const d = DATA[name], r = ratios(d);
+      const card = document.createElement("div");
+      card.className = "kpi-card";
+      card.style.setProperty("--dot-color", d._color);
+      const taxCls = d.tax.status === "yes" ? "tax-yes" : d.tax.status === "no" ? "tax-no" : "tax-unknown";
+      const taxLabel = d.tax.status === "yes" ? "분리과세 대상 (추정)" : d.tax.status === "no" ? "요건 미충족" : "미조사";
+      card.innerHTML = `
+        <div class="kpi-name"><span class="swatch"></span>${name}</div>
+        <div class="kpi-rows">
+          <div class="kpi-row"><span class="k">매출액 (${last(d.years)})</span><span class="v tnum">${fmtWon(last(d.revenue))}</span></div>
+          <div class="kpi-row"><span class="k">순이익률</span><span class="v tnum ${r.netMargin >= 0 ? "pos" : "neg"}">${fmtPct(r.netMargin)}</span></div>
+          <div class="kpi-row"><span class="k">ROE</span><span class="v tnum ${r.roe >= 0 ? "pos" : "neg"}">${fmtPct(r.roe)}</span></div>
+        </div>
+        <div class="tax-chip ${taxCls}">${taxLabel}</div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  // ---- line charts (canvas) ----
+  function drawLineChart(canvasId, legendId, key) {
+    const canvas = document.getElementById(canvasId);
+    const dpr = window.devicePixelRatio || 1;
+    const cssWidth = canvas.parentElement.clientWidth - 32;
+    const cssHeight = 170;
+    canvas.width = cssWidth * dpr;
+    canvas.height = cssHeight * dpr;
+    canvas.style.width = cssWidth + "px";
+    canvas.style.height = cssHeight + "px";
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    const padL = 54, padR = 12, padT = 12, padB = 22;
+    const plotW = cssWidth - padL - padR, plotH = cssHeight - padT - padB;
+
+    let allVals = [];
+    selected.forEach((name) => allVals = allVals.concat(DATA[name][key]));
+    const maxV = Math.max(...allVals, 0);
+    const minV = Math.min(...allVals, 0);
+    const range = (maxV - minV) || 1;
+
+    const styles = getComputedStyle(document.documentElement);
+    const gridColor = styles.getPropertyValue("--border").trim();
+    const inkSoft = styles.getPropertyValue("--ink-soft").trim();
+
+    // gridlines + y labels (4 bands)
+    ctx.strokeStyle = gridColor; ctx.lineWidth = 1; ctx.font = "10px monospace"; ctx.fillStyle = inkSoft;
+    for (let i = 0; i <= 3; i++) {
+      const yVal = minV + (range * i) / 3;
+      const y = padT + plotH - ((yVal - minV) / range) * plotH;
+      ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
+      ctx.fillText(fmtWon(yVal), 2, y + 3);
+    }
+    // zero line emphasis
+    if (minV < 0) {
+      const y0 = padT + plotH - ((0 - minV) / range) * plotH;
+      ctx.strokeStyle = inkSoft; ctx.beginPath(); ctx.moveTo(padL, y0); ctx.lineTo(padL + plotW, y0); ctx.stroke();
+    }
+
+    const years = DATA[selected[0] || ORDER[0]].years;
+    years.forEach((yr, i) => {
+      const x = padL + (plotW * i) / (years.length - 1);
+      ctx.fillStyle = inkSoft;
+      ctx.fillText(yr, x - 12, cssHeight - 6);
+    });
+
+    const legend = document.getElementById(legendId);
+    legend.innerHTML = "";
+    selected.forEach((name) => {
+      const d = DATA[name];
+      const vals = d[key];
+      const color = getComputedStyle(document.documentElement).getPropertyValue(
+        d._color.replace("var(", "").replace(")", "")
+      ).trim() || d._color;
+      ctx.strokeStyle = d._color.startsWith("var") ? resolveVar(d._color) : d._color;
+      ctx.lineWidth = 2.25;
+      ctx.beginPath();
+      vals.forEach((v, i) => {
+        const x = padL + (plotW * i) / (vals.length - 1);
+        const y = padT + plotH - ((v - minV) / range) * plotH;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      vals.forEach((v, i) => {
+        const x = padL + (plotW * i) / (vals.length - 1);
+        const y = padT + plotH - ((v - minV) / range) * plotH;
+        ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = resolveVar(d._color); ctx.fill();
+      });
+      const item = document.createElement("span");
+      item.innerHTML = `<i style="background:${d._color}"></i>${name}`;
+      legend.appendChild(item);
+    });
+  }
+
+  function resolveVar(v) {
+    const m = /var\((--[^)]+)\)/.exec(v);
+    if (!m) return v;
+    return getComputedStyle(document.documentElement).getPropertyValue(m[1]).trim();
+  }
+
+  // ---- ratio bar lists ----
+  function renderBarList(elId, valueFn, fmt) {
+    const el = document.getElementById(elId);
+    el.innerHTML = "";
+    const rows = selected.map((name) => ({ name, v: valueFn(DATA[name]), color: DATA[name]._color }));
+    const maxAbs = Math.max(...rows.map((r) => Math.abs(r.v || 0)), 0.0001);
+    rows.forEach((row) => {
+      const pct = Math.max(2, (Math.abs(row.v || 0) / maxAbs) * 100);
+      const item = document.createElement("div");
+      item.className = "bar-item";
+      item.innerHTML = `
+        <span class="label">${row.name}</span>
+        <span class="bar-track"><span class="bar-fill" style="width:${pct}%;background:${row.color}"></span></span>
+        <span class="bar-val tnum">${fmt(row.v)}</span>
+      `;
+      el.appendChild(item);
+    });
+  }
+
+  // ---- scorecard table ----
+  function renderTable() {
+    const body = document.getElementById("scoreBody");
+    body.innerHTML = "";
+    selected.forEach((name) => {
+      const d = DATA[name], r = ratios(d);
+      const taxCls = d.tax.status === "yes" ? "tax-yes" : d.tax.status === "no" ? "tax-no" : "tax-unknown";
+      const taxLabel = d.tax.status === "yes" ? "충족(추정)" : d.tax.status === "no" ? "미충족" : "미조사";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="name-cell"><span class="swatch" style="background:${d._color}"></span>${name}</td>
+        <td class="num">${fmtWon(last(d.revenue))}</td>
+        <td class="num">${fmtPct(r.opMargin)}</td>
+        <td class="num">${fmtPct(r.netMargin)}</td>
+        <td class="num">${fmtPct(r.roe)}</td>
+        <td class="num">${fmtPct(r.debtRatio)}</td>
+        <td class="num">${fmtPct(r.currentRatio)}</td>
+        <td class="num">${r.revGrowth === null ? "N/A" : fmtPct(r.revGrowth)}</td>
+        <td><span class="tax-chip ${taxCls}">${taxLabel}</span></td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  function renderAll() {
+    renderSelector();
+    renderKpi();
+    drawLineChart("chartRevenue", "legendRevenue", "revenue");
+    drawLineChart("chartOpIncome", "legendOpIncome", "opIncome");
+    drawLineChart("chartNetIncome", "legendNetIncome", "netIncome");
+    renderBarList("barROE", (d) => ratios(d).roe, fmtPct);
+    renderBarList("barDebt", (d) => ratios(d).debtRatio, fmtPct);
+    renderBarList("barOpMargin", (d) => ratios(d).opMargin, fmtPct);
+    renderTable();
+  }
+
+  renderAll();
+  window.addEventListener("resize", () => {
+    drawLineChart("chartRevenue", "legendRevenue", "revenue");
+    drawLineChart("chartOpIncome", "legendOpIncome", "opIncome");
+    drawLineChart("chartNetIncome", "legendNetIncome", "netIncome");
+  });
+})();
+</script>

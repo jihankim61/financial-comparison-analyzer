@@ -1,0 +1,59 @@
+{
+  "한국전력": {
+    "header": 5,
+    "years": [
+      2023,
+      2024,
+      2025
+    ],
+    "revenue": 6,
+    "cogs": 7,
+    "gross_profit": 8,
+    "op_income": 9,
+    "net_income": 10,
+    "curr_assets": 11,
+    "inventory": 12,
+    "curr_liab": 13,
+    "total_assets": 14,
+    "total_liab": 15,
+    "total_equity": 16
+  },
+  "삼성전자": {
+    "header": 20,
+    "years": [
+      2023,
+      2024,
+      2025
+    ],
+    "revenue": 21,
+    "cogs": 22,
+    "gross_profit": 23,
+    "op_income": 24,
+    "net_income": 25,
+    "curr_assets": 26,
+    "inventory": 27,
+    "curr_liab": 28,
+    "total_assets": 29,
+    "total_liab": 30,
+    "total_equity": 31
+  },
+  "SK하이닉스": {
+    "header": 35,
+    "years": [
+      2023,
+      2024,
+      2025
+    ],
+    "revenue": 36,
+    "cogs": 37,
+    "gross_profit": 38,
+    "op_income": 39,
+    "net_income": 40,
+    "curr_assets": 41,
+    "inventory": 42,
+    "curr_liab": 43,
+    "total_assets": 44,
+    "total_liab": 45,
+    "total_equity": 46
+  }
+}

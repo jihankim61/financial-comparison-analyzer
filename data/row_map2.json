@@ -1,0 +1,62 @@
+{
+  "한국전력": {
+    "header": 5,
+    "years": [
+      2023,
+      2024,
+      2025
+    ],
+    "revenue": 6,
+    "cogs": 7,
+    "gross_profit": 8,
+    "op_income": 9,
+    "net_income": 10,
+    "curr_assets": 11,
+    "inventory": 12,
+    "curr_liab": 13,
+    "total_assets": 14,
+    "total_liab": 15,
+    "total_equity": 16,
+    "cash_dividend_total": 17
+  },
+  "LG에너지솔루션": {
+    "header": 21,
+    "years": [
+      2023,
+      2024,
+      2025
+    ],
+    "revenue": 22,
+    "cogs": 23,
+    "gross_profit": 24,
+    "op_income": 25,
+    "net_income": 26,
+    "curr_assets": 27,
+    "inventory": 28,
+    "curr_liab": 29,
+    "total_assets": 30,
+    "total_liab": 31,
+    "total_equity": 32,
+    "cash_dividend_total": 33
+  },
+  "HD현대": {
+    "header": 37,
+    "years": [
+      2023,
+      2024,
+      2025
+    ],
+    "revenue": 38,
+    "cogs": 39,
+    "gross_profit": 40,
+    "op_income": 41,
+    "net_income": 42,
+    "curr_assets": 43,
+    "inventory": 44,
+    "curr_liab": 45,
+    "total_assets": 46,
+    "total_liab": 47,
+    "total_equity": 48,
+    "cash_dividend_total": 49
+  }
+}
