@@ -128,24 +128,30 @@ async function getDividendData(apiKey, corpCode, year) {
   return { dividendByYear, payoutPctByYear };
 }
 
+// 조세특례제한법 제104조의27(고배당기업 주식 배당소득에 대한 과세특례), [본조신설 2025.12.23.]
+// 요건(모두 충족):
+//   1. 사업연도 종료일 현재 코스피·코스닥 상장법인일 것 (코넥스·투자회사 등 제외 - 이 함수는 미확인)
+//   2. 직전 사업연도 배당소득이 2024년 12월 31일이 속하는 사업연도보다 감소하지 않았을 것
+//   3. 가) 직전 사업연도 배당성향 40% 이상, 또는
+//      나) 직전 사업연도 배당성향 25% 이상 AND 이익배당금액이 전전 사업연도 대비 10% 이상 증가
 function computeTaxEligibility(year, dividendByYear, payoutPctByYear) {
-  const divThis = dividendByYear[year];
-  const divPrev = dividendByYear[year - 1];
-  const payoutThis = payoutPctByYear[year];
+  const divThis = dividendByYear[year];           // 직전 사업연도 배당금 (예: 2025)
+  const divBaseline2024 = dividendByYear[2024];    // 법조문상 고정 기준연도(2024년) 배당금
+  const divOneYearAgo = dividendByYear[year - 1];  // 전전 사업연도 배당금 (예: 2024)
+  const payoutThis = payoutPctByYear[year];        // 직전 사업연도 배당성향
 
-  if (divThis === null || divThis === undefined || divPrev === null || divPrev === undefined) {
-    return { status: "unknown", detail: "배당 데이터 부족 (공시 확인 필요)" };
+  if (divThis === null || divThis === undefined || divBaseline2024 === null || divBaseline2024 === undefined) {
+    return { status: "unknown", detail: "배당 데이터 부족 (2024년 기준 비교 불가)" };
   }
-  const condAOk = divThis >= divPrev;
+  const condAOk = divThis >= divBaseline2024;
 
   if (payoutThis === null || payoutThis === undefined) {
     return { status: "unknown", detail: "배당성향 공시 없음" };
   }
 
-  const y3 = [year - 3, year - 2, year - 1].map((y) => dividendByYear[y]);
-  const haveAvg3 = y3.every((v) => v !== null && v !== undefined);
-  const avg3 = haveAvg3 ? (y3[0] + y3[1] + y3[2]) / 3 : null;
-  const growth = avg3 ? divThis / avg3 - 1 : null;
+  const growth = (divOneYearAgo !== null && divOneYearAgo !== undefined && divOneYearAgo !== 0)
+    ? divThis / divOneYearAgo - 1
+    : null;
 
   const payoutFrac = payoutThis / 100;
   let condB = false;
@@ -153,13 +159,13 @@ function computeTaxEligibility(year, dividendByYear, payoutPctByYear) {
   if (payoutFrac >= 0.4) {
     condB = true;
     condBWhy = "배당성향 40%+";
-  } else if (payoutFrac >= 0.25 && growth !== null && growth >= 0.05) {
+  } else if (payoutFrac >= 0.25 && growth !== null && growth >= 0.10) {
     condB = true;
-    condBWhy = "배당성향 25%+ 및 3년평균 대비 5%+ 증가";
+    condBWhy = "배당성향 25%+ 및 전전사업연도 대비 10%+ 증가";
   }
 
   const growthTxt = growth !== null ? `${(growth * 100).toFixed(1)}%` : "N/A(자료부족)";
-  const detail = `배당성향 ${payoutThis.toFixed(1)}% · 3년평균 대비 ${growthTxt}`;
+  const detail = `배당성향 ${payoutThis.toFixed(1)}% · 전전사업연도 대비 ${growthTxt}`;
 
   if (condAOk && condB) {
     return { status: "yes", detail: `${detail} (${condBWhy})` };
