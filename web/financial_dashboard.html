@@ -169,6 +169,18 @@
   footer.dash-footer { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 11.5px; line-height: 1.7; }
   footer.dash-footer strong { color: var(--ink-soft); }
 
+  .status-msg { font-size: 12.5px; padding: 8px 14px; border-radius: 8px; margin: -8px 0 14px; }
+  .status-msg.error { background: var(--neg-soft); color: var(--neg); }
+  .status-msg.info { background: var(--accent-soft); color: var(--accent-strong); }
+  .search-item .sub { color: var(--muted); font-size: 11px; margin-left: 2px; }
+  .kpi-card.loading .kpi-rows { opacity: 0.4; }
+  .kpi-card.loading .kpi-name::after { content: "불러오는 중…"; font-size: 11px; font-weight: 400; color: var(--muted); }
+  tr.loading-row td { color: var(--muted); font-style: italic; }
+  .chip-toggle.loading { opacity: 0.6; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--border-strong); border-top-color: var(--accent); display: inline-block; animation: spin 0.7s linear infinite; }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
   @media (max-width: 640px) {
     .bar-item { grid-template-columns: 72px 1fr 48px; }
   }
@@ -181,16 +193,16 @@
   <div class="dash-header">
     <div>
       <h1 class="dash-title">재무비교분석기 대시보드</h1>
-      <p class="dash-sub">DART Open API 기준 국내 상장기업 재무제표 실데이터 · 회사를 선택해 비교하세요 (최대 5개)</p>
+      <p class="dash-sub">DART Open API로 국내 상장기업 전체(3,976개)를 검색해 비교하세요 (최대 5개)</p>
     </div>
-    <div class="source-badge"><span class="source-dot"></span>DART 최신 사업보고서 · 스냅샷 2026-07-11</div>
+    <div class="source-badge"><span class="source-dot"></span>DART 최신 사업보고서 · 실시간 조회</div>
   </div>
 
   <div class="selector-panel">
     <div class="search-row">
       <span class="selector-label">회사 검색</span>
       <div class="search-input-wrap">
-        <input type="text" id="companySearch" class="search-input" placeholder="회사명을 입력하세요 (예: 삼성전자)" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" />
+        <input type="text" id="companySearch" class="search-input" placeholder="회사명을 입력하세요 (예: 네이버, 카카오, 포스코...)" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" />
         <div class="search-dropdown" id="searchDropdown" hidden></div>
       </div>
       <span class="search-hint">입력 후 Enter 또는 클릭으로 추가</span>
@@ -200,6 +212,8 @@
       <span class="selector-count" id="selCount"></span>
     </div>
   </div>
+
+  <div class="status-msg" id="statusMsg" hidden></div>
 
   <div class="kpi-grid" id="kpiGrid"></div>
 
@@ -232,16 +246,19 @@
 
   <footer class="dash-footer">
     <strong>데이터 출처.</strong> 금융감독원 전자공시시스템(DART) Open API — 각 기업 최신 사업보고서 기준 연결재무제표(미제출 시 별도). 비율은 원본 수치로부터 이 페이지에서 실시간 계산합니다.<br>
-    <strong>분리과세 판정.</strong> 2025년 세제개편안(조세특례제한법 §91의19, 2026.1.1 시행 예정) 관련 보도를 근거로 한 추정치이며, 삼성전자·SK하이닉스·한국전력 3개사만 확인했습니다. 확정 법령이 아니므로 실제 신고 전 국세청·세무전문가 확인이 필요합니다.<br>
+    <strong>분리과세 판정.</strong> 2025년 세제개편안(조세특례제한법 §91의19, 2026.1.1 시행 예정) 관련 보도를 근거로 한 추정치이며, 검색한 기업마다 실시간으로 배당 공시를 조회해 판정합니다. 확정 법령이 아니므로 실제 신고 전 국세청·세무전문가 확인이 필요합니다.<br>
     <strong>표기.</strong> 값이 없거나 계정과목 매칭에 실패한 경우 <span class="mono">N/A</span>로 표시됩니다.
   </footer>
 </div>
 
 <script>
 (function () {
-  // ---- raw data (DART Open API, 원 단위) ----
-  const DATA = {
-    "삼성전자": { years: [2023,2024,2025],
+  const MAX_SELECT = 5;
+  const catVar = (i) => `var(--cat-${(i % 8) + 1})`;
+
+  // ---- seed data (instant load, also used as offline fallback if /api isn't deployed) ----
+  const SEED = [
+    ["00126380", "삼성전자", { years: [2023,2024,2025],
       revenue:[258935494000000,300870903000000,333605938000000],
       opIncome:[6566976000000,32725961000000,43601051000000],
       netIncome:[15487100000000,34451351000000,45206805000000],
@@ -250,8 +267,8 @@
       totalEquity:[363677865000000,402192070000000,436320337000000],
       currAssets:[195936557000000,227062266000000,247684612000000],
       currLiab:[75719452000000,93326299000000,106411348000000],
-      tax: {status:"yes", detail:"배당성향 25.1% · 3년평균 대비 +13.2%"} },
-    "SK하이닉스": { years:[2023,2024,2025],
+      tax: {status:"yes", detail:"배당성향 25.1% · 3년평균 대비 +13.2% (배당성향 25%+ 및 3년평균 대비 5%+ 증가)"} }],
+    ["00164779", "SK하이닉스", { years:[2023,2024,2025],
       revenue:[32765719000000,66192960000000,97146675000000],
       opIncome:[-7730313000000,23467319000000,47206319000000],
       netIncome:[-9137547000000,19796902000000,42947902000000],
@@ -260,8 +277,8 @@
       totalEquity:[53503752000000,73915704000000,120666751000000],
       currAssets:[30468100000000,42278887000000,69458073000000],
       currLiab:[21007810000000,24965444000000,37378999000000],
-      tax: {status:"no", detail:"배당성향 4.9% (25% 미만)"} },
-    "현대자동차": { years:[2023,2024,2025],
+      tax: {status:"no", detail:"배당성향 4.9% (25% 미만)"} }],
+    ["00164742", "현대자동차", { years:[2023,2024,2025],
       revenue:[162663579000000,175231153000000,186254472000000],
       opIncome:[15126901000000,14239592000000,11467851000000],
       netIncome:[12272301000000,13229908000000,10364775000000],
@@ -270,8 +287,8 @@
       totalEquity:[101809440000000,120275933000000,127648237000000],
       currAssets:[101724717000000,115764287000000,120777363000000],
       currLiab:[73362103000000,79509643000000,88579290000000],
-      tax: {status:"unknown"} },
-    "한국전력": { years:[2023,2024,2025],
+      tax: {status:"unknown"} }],
+    ["00159193", "한국전력", { years:[2023,2024,2025],
       revenue:[88219461000000,93398896000000,97429346000000],
       opIncome:[-4541648000000,8364710000000,13490557000000],
       netIncome:[-4716144000000,3621968000000,8666656000000],
@@ -280,8 +297,8 @@
       totalEquity:[37264750000000,41362833000000,49322944000000],
       currAssets:[29536215000000,29255205000000,30715388000000],
       currLiab:[61248421000000,63968789000000,67107317000000],
-      tax: {status:"no", detail:"배당성향 11.6% (25% 미만)"} },
-    "LG에너지솔루션": { years:[2023,2024,2025],
+      tax: {status:"no", detail:"배당성향 11.6% (25% 미만)"} }],
+    ["01515323", "LG에너지솔루션", { years:[2023,2024,2025],
       revenue:[33745470000000,25619585000000,23671759000000],
       opIncome:[2163234000000,575387000000,1346120000000],
       netIncome:[1637985000000,338602000000,80803000000],
@@ -290,8 +307,8 @@
       totalEquity:[24373509000000,30966543000000,29321676000000],
       currAssets:[17208396000000,15327395000000,18412127000000],
       currLiab:[10937185000000,12054922000000,16785357000000],
-      tax: {status:"unknown", detail:"배당 이력 없음"} },
-    "HD현대": { years:[2023,2024,2025],
+      tax: {status:"unknown", detail:"배당 이력 없음"} }],
+    ["01205709", "HD현대", { years:[2023,2024,2025],
       revenue:[61331302785000,67765626088000,71259438270000],
       opIncome:[2031563587000,2983162778000,6099636253000],
       netIncome:[785832206000,1930179481000,3675482625000],
@@ -300,8 +317,8 @@
       totalEquity:[23231837100000,26385102145000,30335091114000],
       currAssets:[32083110520000,35592849734000,39632675115000],
       currLiab:[28532163119000,32333112202000,33637107184000],
-      tax: {status:"unknown"} },
-    "LG유플러스": { years:[2023,2024,2025],
+      tax: {status:"unknown"} }],
+    ["00231363", "LG유플러스", { years:[2023,2024,2025],
       revenue:[14372626000000,14625198000000,15451745000000],
       opIncome:[998031000000,863130000000,892131000000],
       netIncome:[630241000000,314602000000,509226000000],
@@ -310,8 +327,8 @@
       totalEquity:[8756785000000,8768379000000,9067527000000],
       currAssets:[4964158000000,5263896000000,5414363000000],
       currLiab:[5606861000000,5116288000000,4676319000000],
-      tax: {status:"unknown"} },
-    "셀트리온": { years:[2023,2024,2025],
+      tax: {status:"unknown"} }],
+    ["00413046", "셀트리온", { years:[2023,2024,2025],
       revenue:[2176431531380,3557303554371,4162495108881],
       opIncome:[651481422157,492015534847,1168471345595],
       netIncome:[539706505110,418883310404,1031483789240],
@@ -320,14 +337,19 @@
       totalEquity:[17125794307235,17580062368691,17352529819114],
       currAssets:[5094010887675,5584129149603,6205267557980],
       currLiab:[2512385333437,3187120605915,4453815745874],
-      tax: {status:"unknown"} },
-  };
-  const ORDER = Object.keys(DATA);
-  const MAX_SELECT = 5;
-  const catVar = (i) => `var(--cat-${(i % 8) + 1})`;
-  ORDER.forEach((name, i) => DATA[name]._color = catVar(i));
+      tax: {status:"unknown"} }],
+  ];
 
-  let selected = ["삼성전자", "SK하이닉스", "한국전력"];
+  const cache = {};       // corp_code -> data object (with .name, .code, ._color)
+  const loading = {};     // corp_code -> true while a fetch is in flight
+  let selected = [];
+  let colorIndex = 0;
+  let apiSearchBroken = false;
+
+  SEED.forEach(([code, name, data]) => {
+    cache[code] = Object.assign({ name, code, _color: catVar(colorIndex++) }, data);
+  });
+  selected = ["00126380", "00164779", "00159193"]; // 삼성전자, SK하이닉스, 한국전력
 
   // ---- helpers ----
   const fmtWon = (v) => {
@@ -337,8 +359,9 @@
     return (v / hundredMil).toFixed(0) + "억";
   };
   const fmtPct = (v) => (v === null || v === undefined || isNaN(v)) ? "N/A" : (v * 100).toFixed(1) + "%";
-  const last = (arr) => arr[arr.length - 1];
-  const prev = (arr) => arr[arr.length - 2];
+  const last = (arr) => (arr ? arr[arr.length - 1] : null);
+  const prev = (arr) => (arr ? arr[arr.length - 2] : null);
+  const safeDiv = (a, b) => (a === null || a === undefined || b === null || b === undefined || b === 0) ? null : a / b;
 
   function ratios(d) {
     const rev = last(d.revenue), op = last(d.opIncome), ni = last(d.netIncome);
@@ -346,110 +369,180 @@
     const ca = last(d.currAssets), cl = last(d.currLiab);
     const prevRev = prev(d.revenue);
     return {
-      opMargin: op / rev, netMargin: ni / rev, roe: ni / te, roa: ni / ta,
-      debtRatio: tl / te, currentRatio: ca / cl,
-      revGrowth: prevRev ? (rev - prevRev) / prevRev : null,
+      opMargin: safeDiv(op, rev), netMargin: safeDiv(ni, rev), roe: safeDiv(ni, te), roa: safeDiv(ni, ta),
+      debtRatio: safeDiv(tl, te), currentRatio: safeDiv(ca, cl),
+      revGrowth: (prevRev !== null && prevRev !== undefined) ? safeDiv(rev - prevRev, prevRev) : null,
     };
   }
 
-  // ---- selector chips ----
-  const bar = document.getElementById("selectorBar");
-  const countEl = document.getElementById("selCount");
-  function toggleCompany(name) {
-    if (selected.includes(name)) {
-      selected = selected.filter((n) => n !== name);
-    } else if (selected.length < MAX_SELECT) {
-      selected.push(name);
+  function showStatus(kind, msg) {
+    const el = document.getElementById("statusMsg");
+    el.className = "status-msg " + kind;
+    el.textContent = msg;
+    el.hidden = false;
+  }
+  function clearStatus() {
+    document.getElementById("statusMsg").hidden = true;
+  }
+
+  // ---- data fetching ----
+  async function fetchCompany(code, name) {
+    const res = await fetch(`/api/company?code=${encodeURIComponent(code)}&name=${encodeURIComponent(name)}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `조회 실패 (HTTP ${res.status})`);
+    return data;
+  }
+
+  async function selectCompany(code, name) {
+    if (selected.includes(code) || selected.length >= MAX_SELECT) return;
+    selected.push(code);
+    clearStatus();
+    if (!cache[code]) {
+      loading[code] = true;
+      renderAll();
+      try {
+        const data = await fetchCompany(code, name);
+        cache[code] = Object.assign({ name: name || data.name, code, _color: catVar(colorIndex++) }, data);
+      } catch (err) {
+        selected = selected.filter((c) => c !== code);
+        showStatus("error", `${name || code}: ${err.message}`);
+      } finally {
+        delete loading[code];
+        renderAll();
+      }
+    } else {
+      renderAll();
     }
+  }
+
+  function deselectCompany(code) {
+    selected = selected.filter((c) => c !== code);
     renderAll();
   }
+
+  // ---- quick-select chips (the 8 seed companies) ----
+  const bar = document.getElementById("selectorBar");
+  const countEl = document.getElementById("selCount");
   function renderSelector() {
     bar.querySelectorAll(".chip-toggle").forEach((el) => el.remove());
-    ORDER.forEach((name) => {
+    SEED.forEach(([code, name]) => {
       const chip = document.createElement("button");
       chip.type = "button";
-      chip.className = "chip-toggle" + (selected.includes(name) ? " active" : "");
-      chip.style.setProperty("--dot-color", DATA[name]._color);
+      const isSel = selected.includes(code);
+      chip.className = "chip-toggle" + (isSel ? " active" : "") + (loading[code] ? " loading" : "");
+      chip.style.setProperty("--dot-color", cache[code]._color);
       chip.innerHTML = `<span class="dot"></span>${name}`;
-      chip.disabled = !selected.includes(name) && selected.length >= MAX_SELECT;
-      chip.addEventListener("click", () => toggleCompany(name));
+      chip.disabled = !isSel && selected.length >= MAX_SELECT;
+      chip.addEventListener("click", () => (isSel ? deselectCompany(code) : selectCompany(code, name)));
       bar.appendChild(chip);
     });
     bar.appendChild(countEl);
     countEl.textContent = `${selected.length} / ${MAX_SELECT} 선택됨`;
   }
 
-  // ---- search / direct text entry ----
+  // ---- live search / direct text entry ----
   const searchInput = document.getElementById("companySearch");
   const dropdown = document.getElementById("searchDropdown");
   let hlIndex = -1;
-
-  function matchCompanies(query) {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return ORDER.filter((name) => name.toLowerCase().includes(q));
-  }
-
-  function addCompany(name) {
-    if (!DATA[name] || selected.includes(name) || selected.length >= MAX_SELECT) return;
-    selected.push(name);
-    searchInput.value = "";
-    hlIndex = -1;
-    closeDropdown();
-    renderAll();
-    searchInput.focus();
-  }
+  let searchSeq = 0;
+  let debounceTimer = null;
 
   function closeDropdown() {
     dropdown.hidden = true;
     searchInput.setAttribute("aria-expanded", "false");
   }
 
-  function renderDropdown(query) {
-    const results = matchCompanies(query);
+  function localFallbackMatch(q) {
+    const ql = q.toLowerCase();
+    return SEED.filter(([, name]) => name.toLowerCase().includes(ql)).map(([code, name]) => ({ code, name }));
+  }
+
+  async function runSearch(query) {
+    const q = query.trim();
+    if (!q) { closeDropdown(); return; }
+    const seq = ++searchSeq;
+
+    if (apiSearchBroken) {
+      renderDropdownResults(localFallbackMatch(q), true);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      if (!res.ok) throw new Error("search api error");
+      const list = await res.json();
+      if (seq !== searchSeq) return; // stale response, a newer keystroke superseded it
+      renderDropdownResults(list.map((c) => ({ code: c.code, name: c.name, stock: c.stock })), false);
+    } catch (err) {
+      apiSearchBroken = true;
+      if (seq !== searchSeq) return;
+      renderDropdownResults(localFallbackMatch(q), true);
+    }
+  }
+
+  function renderDropdownResults(results, isFallback) {
     dropdown.innerHTML = "";
-    if (!query.trim()) { closeDropdown(); return; }
+    if (isFallback) {
+      const notice = document.createElement("div");
+      notice.className = "search-empty";
+      notice.textContent = "실시간 검색 연결 안 됨 — 8개 기본 기업 중에서만 검색됩니다";
+      dropdown.appendChild(notice);
+    }
     if (results.length === 0) {
       const div = document.createElement("div");
       div.className = "search-empty";
-      div.textContent = "일치하는 기업이 없습니다 (현재 8개 기업 데이터만 지원)";
+      div.textContent = "일치하는 기업이 없습니다";
       dropdown.appendChild(div);
       dropdown.hidden = false;
       searchInput.setAttribute("aria-expanded", "true");
       return;
     }
-    results.forEach((name, i) => {
-      const already = selected.includes(name);
+    results.forEach((r, i) => {
+      const already = selected.includes(r.code);
       const full = !already && selected.length >= MAX_SELECT;
       const item = document.createElement("div");
       item.className = "search-item" + (already || full ? " disabled" : "") + (i === hlIndex ? " hl" : "");
       item.setAttribute("role", "option");
-      item.innerHTML = `<span class="dot" style="background:${DATA[name]._color}"></span>${name}${already ? " · 선택됨" : ""}`;
+      const swatchColor = cache[r.code] ? cache[r.code]._color : "var(--muted)";
+      item.innerHTML = `<span class="dot" style="background:${swatchColor}"></span>${r.name}${r.stock ? `<span class="sub">${r.stock}</span>` : ""}${already ? " · 선택됨" : ""}`;
       item.addEventListener("mousedown", (e) => {
         e.preventDefault();
         if (already || full) return;
-        addCompany(name);
+        searchInput.value = "";
+        hlIndex = -1;
+        closeDropdown();
+        selectCompany(r.code, r.name);
+        searchInput.focus();
       });
       dropdown.appendChild(item);
     });
     dropdown.hidden = false;
     searchInput.setAttribute("aria-expanded", "true");
+    window._lastSearchResults = results;
   }
 
-  searchInput.addEventListener("input", () => { hlIndex = -1; renderDropdown(searchInput.value); });
-  searchInput.addEventListener("focus", () => { if (searchInput.value.trim()) renderDropdown(searchInput.value); });
+  searchInput.addEventListener("input", () => {
+    hlIndex = -1;
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => runSearch(searchInput.value), 220);
+  });
+  searchInput.addEventListener("focus", () => { if (searchInput.value.trim()) runSearch(searchInput.value); });
   searchInput.addEventListener("keydown", (e) => {
-    const results = matchCompanies(searchInput.value);
+    const results = window._lastSearchResults || [];
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      if (results.length) { hlIndex = Math.min(hlIndex + 1, results.length - 1); renderDropdown(searchInput.value); }
+      if (results.length) { hlIndex = Math.min(hlIndex + 1, results.length - 1); renderDropdownResults(results, apiSearchBroken); }
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      if (results.length) { hlIndex = Math.max(hlIndex - 1, 0); renderDropdown(searchInput.value); }
+      if (results.length) { hlIndex = Math.max(hlIndex - 1, 0); renderDropdownResults(results, apiSearchBroken); }
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const pick = results[hlIndex] ?? results[0];
-      if (pick) addCompany(pick);
+      const pick = results[hlIndex] || results[0];
+      if (pick && !selected.includes(pick.code) && selected.length < MAX_SELECT) {
+        searchInput.value = "";
+        hlIndex = -1;
+        closeDropdown();
+        selectCompany(pick.code, pick.name);
+      }
     } else if (e.key === "Escape") {
       closeDropdown();
     }
@@ -462,29 +555,41 @@
   function renderKpi() {
     const grid = document.getElementById("kpiGrid");
     grid.innerHTML = "";
-    selected.forEach((name) => {
-      const d = DATA[name], r = ratios(d);
+    selected.forEach((code) => {
+      const isLoading = !!loading[code];
+      const d = cache[code];
       const card = document.createElement("div");
-      card.className = "kpi-card";
-      card.style.setProperty("--dot-color", d._color);
+      card.className = "kpi-card" + (isLoading ? " loading" : "");
+      card.style.setProperty("--dot-color", d ? d._color : "var(--muted)");
+      if (isLoading) {
+        card.innerHTML = `<div class="kpi-name"><span class="swatch"></span></div><div class="kpi-rows"><div class="kpi-row"><span class="k">데이터 조회 중</span><span class="v"><span class="spinner"></span></span></div></div>`;
+        grid.appendChild(card);
+        return;
+      }
+      const r = ratios(d);
       const taxCls = d.tax.status === "yes" ? "tax-yes" : d.tax.status === "no" ? "tax-no" : "tax-unknown";
       const taxLabel = d.tax.status === "yes" ? "분리과세 대상 (추정)" : d.tax.status === "no" ? "요건 미충족" : "미조사";
       card.innerHTML = `
-        <div class="kpi-name"><span class="swatch"></span>${name}</div>
+        <div class="kpi-name"><span class="swatch"></span>${d.name}</div>
         <div class="kpi-rows">
           <div class="kpi-row"><span class="k">매출액 (${last(d.years)})</span><span class="v tnum">${fmtWon(last(d.revenue))}</span></div>
           <div class="kpi-row"><span class="k">순이익률</span><span class="v tnum ${r.netMargin >= 0 ? "pos" : "neg"}">${fmtPct(r.netMargin)}</span></div>
           <div class="kpi-row"><span class="k">ROE</span><span class="v tnum ${r.roe >= 0 ? "pos" : "neg"}">${fmtPct(r.roe)}</span></div>
         </div>
-        <div class="tax-chip ${taxCls}">${taxLabel}</div>
+        <div class="tax-chip ${taxCls}" title="${(d.tax.detail || "").replace(/"/g, "&quot;")}">${taxLabel}</div>
       `;
       grid.appendChild(card);
     });
   }
 
   // ---- line charts (canvas) ----
+  function loadedSelected() {
+    return selected.filter((code) => cache[code] && !loading[code]);
+  }
+
   function drawLineChart(canvasId, legendId, key) {
     const canvas = document.getElementById(canvasId);
+    const codes = loadedSelected();
     const dpr = window.devicePixelRatio || 1;
     const cssWidth = canvas.parentElement.clientWidth - 32;
     const cssHeight = 170;
@@ -496,11 +601,16 @@
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, cssWidth, cssHeight);
 
+    const legend = document.getElementById(legendId);
+    legend.innerHTML = "";
+    if (codes.length === 0) return;
+
     const padL = 54, padR = 12, padT = 12, padB = 22;
     const plotW = cssWidth - padL - padR, plotH = cssHeight - padT - padB;
 
     let allVals = [];
-    selected.forEach((name) => allVals = allVals.concat(DATA[name][key]));
+    codes.forEach((code) => allVals = allVals.concat((cache[code][key] || []).filter((v) => v !== null && v !== undefined)));
+    if (allVals.length === 0) return;
     const maxV = Math.max(...allVals, 0);
     const minV = Math.min(...allVals, 0);
     const range = (maxV - minV) || 1;
@@ -509,7 +619,6 @@
     const gridColor = styles.getPropertyValue("--border").trim();
     const inkSoft = styles.getPropertyValue("--ink-soft").trim();
 
-    // gridlines + y labels (4 bands)
     ctx.strokeStyle = gridColor; ctx.lineWidth = 1; ctx.font = "10px monospace"; ctx.fillStyle = inkSoft;
     for (let i = 0; i <= 3; i++) {
       const yVal = minV + (range * i) / 3;
@@ -517,28 +626,23 @@
       ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
       ctx.fillText(fmtWon(yVal), 2, y + 3);
     }
-    // zero line emphasis
     if (minV < 0) {
       const y0 = padT + plotH - ((0 - minV) / range) * plotH;
       ctx.strokeStyle = inkSoft; ctx.beginPath(); ctx.moveTo(padL, y0); ctx.lineTo(padL + plotW, y0); ctx.stroke();
     }
 
-    const years = DATA[selected[0] || ORDER[0]].years;
+    const years = cache[codes[0]].years;
     years.forEach((yr, i) => {
       const x = padL + (plotW * i) / (years.length - 1);
       ctx.fillStyle = inkSoft;
       ctx.fillText(yr, x - 12, cssHeight - 6);
     });
 
-    const legend = document.getElementById(legendId);
-    legend.innerHTML = "";
-    selected.forEach((name) => {
-      const d = DATA[name];
-      const vals = d[key];
-      const color = getComputedStyle(document.documentElement).getPropertyValue(
-        d._color.replace("var(", "").replace(")", "")
-      ).trim() || d._color;
-      ctx.strokeStyle = d._color.startsWith("var") ? resolveVar(d._color) : d._color;
+    codes.forEach((code) => {
+      const d = cache[code];
+      const vals = d[key] || [];
+      if (vals.some((v) => v === null || v === undefined)) return;
+      ctx.strokeStyle = resolveVar(d._color);
       ctx.lineWidth = 2.25;
       ctx.beginPath();
       vals.forEach((v, i) => {
@@ -554,7 +658,7 @@
         ctx.fillStyle = resolveVar(d._color); ctx.fill();
       });
       const item = document.createElement("span");
-      item.innerHTML = `<i style="background:${d._color}"></i>${name}`;
+      item.innerHTML = `<i style="background:${d._color}"></i>${d.name}`;
       legend.appendChild(item);
     });
   }
@@ -569,7 +673,8 @@
   function renderBarList(elId, valueFn, fmt) {
     const el = document.getElementById(elId);
     el.innerHTML = "";
-    const rows = selected.map((name) => ({ name, v: valueFn(DATA[name]), color: DATA[name]._color }));
+    const codes = loadedSelected();
+    const rows = codes.map((code) => ({ name: cache[code].name, v: valueFn(cache[code]), color: cache[code]._color }));
     const maxAbs = Math.max(...rows.map((r) => Math.abs(r.v || 0)), 0.0001);
     rows.forEach((row) => {
       const pct = Math.max(2, (Math.abs(row.v || 0) / maxAbs) * 100);
@@ -588,13 +693,22 @@
   function renderTable() {
     const body = document.getElementById("scoreBody");
     body.innerHTML = "";
-    selected.forEach((name) => {
-      const d = DATA[name], r = ratios(d);
+    selected.forEach((code) => {
+      if (loading[code]) {
+        const tr = document.createElement("tr");
+        tr.className = "loading-row";
+        tr.innerHTML = `<td colspan="9"><span class="spinner"></span> 데이터 조회 중…</td>`;
+        body.appendChild(tr);
+        return;
+      }
+      const d = cache[code];
+      if (!d) return;
+      const r = ratios(d);
       const taxCls = d.tax.status === "yes" ? "tax-yes" : d.tax.status === "no" ? "tax-no" : "tax-unknown";
       const taxLabel = d.tax.status === "yes" ? "충족(추정)" : d.tax.status === "no" ? "미충족" : "미조사";
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td class="name-cell"><span class="swatch" style="background:${d._color}"></span>${name}</td>
+        <td class="name-cell"><span class="swatch" style="background:${d._color}"></span>${d.name}</td>
         <td class="num">${fmtWon(last(d.revenue))}</td>
         <td class="num">${fmtPct(r.opMargin)}</td>
         <td class="num">${fmtPct(r.netMargin)}</td>
@@ -602,7 +716,7 @@
         <td class="num">${fmtPct(r.debtRatio)}</td>
         <td class="num">${fmtPct(r.currentRatio)}</td>
         <td class="num">${r.revGrowth === null ? "N/A" : fmtPct(r.revGrowth)}</td>
-        <td><span class="tax-chip ${taxCls}">${taxLabel}</span></td>
+        <td><span class="tax-chip ${taxCls}" title="${(d.tax.detail || "").replace(/"/g, "&quot;")}">${taxLabel}</span></td>
       `;
       body.appendChild(tr);
     });
