@@ -3,8 +3,10 @@ const path = require("path");
 
 const EXACT_ALIASES = {
   revenue: ["매출액", "수익(매출액)", "영업수익"],
-  opIncome: ["영업이익", "영업이익(손실)"],
-  netIncome: ["당기순이익", "당기순이익(손실)"],
+  opIncome: ["영업이익", "영업이익(손실)", "영업손실"],
+  // 회사마다 손익 부호에 따라 계정명을 다르게 씀: "당기순이익", "당기순이익(손실)"(흑자/적자 겸용),
+  // "당기순손실"(적자 전용, 예: SK이노베이션), "당기순손익"(흑자/적자 중립 표기, 예: 카카오페이) 등.
+  netIncome: ["당기순이익", "당기순이익(손실)", "당기순손실", "당기순손익"],
   currAssets: ["유동자산"],
   currLiab: ["유동부채"],
   totalAssets: ["자산총계"],
@@ -39,25 +41,51 @@ function pickItem(items, aliases) {
 }
 
 // 시행령 제104조의24④1호: 연결재무제표 작성법인은 배당성향 산정 시 "지배회사 소유주지분
-// 당기순이익"을 분모로 써야 한다 (총 당기순이익이 아님) — pickItem()은 이 항목을 일부러
-// 제외하므로(EXCLUDE_SUBSTR), 별도 함수로 정확히 이 항목만 찾는다.
-const CONTROLLING_NI_ALIASES = [
-  "지배기업의 소유주에게 귀속되는 당기순이익",
-  "지배기업 소유주지분 당기순이익",
-  "지배기업의 소유주지분에 귀속되는 당기순이익",
-  "지배기업소유주지분당기순이익",
-  "지배기업의 소유주지분",
-];
-function pickControllingNetIncome(items) {
-  const pool = items.filter((it) => VALID_SJ.has(it.sj_div));
-  for (const alias of CONTROLLING_NI_ALIASES) {
-    const hit = pool.find((it) => (it.account_nm || "").trim() === alias);
-    if (hit) return hit;
+// 당기순이익"을 분모로 써야 한다 (총 당기순이익이 아님).
+//
+// 문제는 이 계정의 실제 표기가 회사마다 제각각이라는 것 — 삼성전자는 "지배기업 소유주지분"
+// (공백 있음, "당기순이익" 접미사 없음), 카카오페이는 "지배기업소유주지분"(공백 없음) 처럼
+// 그 자체로는 "당기순이익"이라는 단어를 포함하지 않는 경우가 많다. 대신 이 항목은 항상
+// "당기순이익/당기순손실/당기순손익" 합계 행 바로 다음 줄(ord 순서상 인접)에 "비지배지분"과
+// 나란히 나오는 손익 분해 항목이므로, 합계 행의 ord 값에 가장 가까운 후보를 고른다.
+// 그래도 못 찾으면 "총당기순이익 - 비지배지분"으로 역산하고, 비지배지분 행 자체가 없으면
+// (자회사가 없거나 완전자회사만 있는 경우) 총당기순이익 = 지배주주지분으로 본다.
+function isControllingLabel(nm) {
+  return nm.includes("지배") && !nm.includes("비지배") && (nm.includes("소유주") || nm.includes("지분"));
+}
+function isNonControllingLabel(nm) {
+  return nm.includes("비지배");
+}
+function closestByOrd(candidates, baseOrd) {
+  const withDelta = candidates.map((it) => ({ it, delta: Number(it.ord) - baseOrd }));
+  withDelta.sort((a, b) => {
+    const aFwd = a.delta >= 0, bFwd = b.delta >= 0;
+    if (aFwd !== bFwd) return aFwd ? -1 : 1; // 합계 행보다 뒤에 나오는(ord가 큰) 항목을 우선
+    return Math.abs(a.delta) - Math.abs(b.delta);
+  });
+  return withDelta[0].it;
+}
+function pickControllingNetIncome(items, totalNetIncomeItem) {
+  if (!totalNetIncomeItem) return null;
+  const pool = items.filter((it) => it.sj_div === totalNetIncomeItem.sj_div);
+  const baseOrd = Number(totalNetIncomeItem.ord);
+
+  const controllingCandidates = pool.filter((it) => isControllingLabel(it.account_nm || ""));
+  if (controllingCandidates.length) {
+    const best = closestByOrd(controllingCandidates, baseOrd);
+    const v = toNumber(best.thstrm_amount);
+    if (v !== null) return { amount: v, method: `직접 매칭(${best.account_nm})` };
   }
-  for (const alias of CONTROLLING_NI_ALIASES) {
-    const hit = pool.find((it) => (it.account_nm || "").includes(alias));
-    if (hit) return hit;
+
+  const ncCandidates = pool.filter((it) => isNonControllingLabel(it.account_nm || ""));
+  if (ncCandidates.length) {
+    const nc = toNumber(closestByOrd(ncCandidates, baseOrd).thstrm_amount);
+    const total = toNumber(totalNetIncomeItem.thstrm_amount);
+    if (nc !== null && total !== null) return { amount: total - nc, method: "역산(총당기순이익 - 비지배지분)" };
   }
+
+  const total = toNumber(totalNetIncomeItem.thstrm_amount);
+  if (total !== null) return { amount: total, method: "비지배지분 없음(총당기순이익 = 지배주주지분으로 간주)" };
   return null;
 }
 
@@ -274,38 +302,76 @@ function computeTaxEligibility(year, dividendByYear, payoutPctByYear, netIncomeF
     ? (override.overridden ? `배당성향 ${payoutThis.toFixed(1)}% (시행령⑤ 간주, 원 공시값 ${reportedPayout === null || reportedPayout === undefined ? "N/A" : reportedPayout.toFixed(1) + "%"})` : `배당성향 ${payoutThis.toFixed(1)}%`)
     : "배당성향 공시 없음";
 
+  const fmtWon = (n) => (n === null || n === undefined) ? "N/A" : `${Math.round(n).toLocaleString("ko-KR")}원`;
+  const fmtPct = (n) => (n === null || n === undefined) ? "N/A" : `${n.toFixed(1)}%`;
+
+  // metrics: 조건마다 "실제값 vs 기준값"을 그대로 숫자로 노출 — 텍스트 설명 없이도 판정 근거를 바로 확인 가능
   const conditions = [
     {
       key: "listed",
       label: "① 코스피·코스닥 상장법인 (코넥스·투자회사 제외)",
       pass: null,
       detail: "이 도구는 상장 여부만 확인하며 코넥스·투자회사 해당 여부는 확인하지 않음",
+      metrics: [],
     },
     {
       key: "nonDecrease",
       label: `② 직전사업연도(${year}) 배당액, 2024사업연도 대비 비감소`,
       pass: nonDecreasePass,
-      detail: haveNonDecreaseData
-        ? `${year}년 ${Math.round(divThis).toLocaleString("ko-KR")}원 vs 2024년 ${Math.round(divBaseline2024).toLocaleString("ko-KR")}원`
-        : "배당 데이터 부족",
+      detail: haveNonDecreaseData ? null : "배당 데이터 부족",
+      metrics: haveNonDecreaseData ? [{
+        label: `${year}년 배당금 vs 2024년 배당금`,
+        actual: divThis, actualFmt: fmtWon(divThis),
+        threshold: divBaseline2024, thresholdFmt: fmtWon(divBaseline2024),
+        comparator: ">=", pass: nonDecreasePass,
+      }] : [],
     },
     {
       key: "payout40",
       label: "③-가 배당성향 40% 이상",
       pass: pass40,
-      detail: payoutDetailTxt,
+      detail: override.overridden ? `시행령⑤ 간주 적용 (원 공시값 ${fmtPct(reportedPayout)})` : null,
+      metrics: havePayout ? [{
+        label: "배당성향",
+        actual: payoutThis, actualFmt: fmtPct(payoutThis),
+        threshold: 40, thresholdFmt: "40.0%",
+        comparator: ">=", pass: pass40,
+      }] : [],
     },
     {
       key: "payout25Growth10",
       label: "③-나 배당성향 25% 이상 AND 전전사업연도 대비 10% 이상 증가",
       pass: pass25Growth10,
-      detail: (havePayout && growth !== null)
-        ? `${payoutDetailTxt}, 증가율 ${(growth * 100).toFixed(1)}%`
-        : "배당성향 또는 전전사업연도 배당 데이터 부족",
+      detail: (havePayout && growth !== null) ? (override.overridden ? `시행령⑤ 간주 적용 (원 공시값 ${fmtPct(reportedPayout)})` : null) : "배당성향 또는 전전사업연도 배당 데이터 부족",
+      metrics: (havePayout && growth !== null) ? [
+        {
+          label: "배당성향",
+          actual: payoutThis, actualFmt: fmtPct(payoutThis),
+          threshold: 25, thresholdFmt: "25.0%",
+          comparator: ">=", pass: payoutFrac >= 0.25,
+        },
+        {
+          label: "전전사업연도 대비 증가율",
+          actual: growth * 100, actualFmt: fmtPct(growth * 100),
+          threshold: 10, thresholdFmt: "10.0%",
+          comparator: ">=", pass: growth >= 0.10,
+        },
+      ] : [],
     },
   ];
   if (override.overridden) {
-    conditions.push({ key: "netLossOverride", label: "※ 시행령 제104조의24⑤ 당기순손실 간주규정 적용", pass: null, detail: override.reason });
+    conditions.push({
+      key: "netLossOverride",
+      label: "※ 시행령 제104조의24⑤ 당기순손실 간주규정 적용",
+      pass: null,
+      detail: override.reason,
+      metrics: [{
+        label: "직전사업연도 당기순이익(지배주주지분 기준)",
+        actual: netIncomeForCheck, actualFmt: fmtWon(netIncomeForCheck),
+        threshold: 0, thresholdFmt: "0원",
+        comparator: ">", pass: netIncomeForCheck !== null && netIncomeForCheck !== undefined ? netIncomeForCheck > 0 : null,
+      }],
+    });
   }
 
   const growthTxt = growth !== null ? `${(growth * 100).toFixed(1)}%` : "N/A(자료부족)";
@@ -376,13 +442,11 @@ module.exports = async (req, res) => {
     let netIncomeForCheck = periods.netIncome.thstrm;
     let netIncomeBasisNote = fsDiv === "OFS" ? "별도재무제표 당기순이익" : "연결 총당기순이익(지배주주지분 항목 미확인, 근사치)";
     if (fsDiv === "CFS") {
-      const controllingNI = pickControllingNetIncome(items);
-      if (controllingNI) {
-        const v = toNumber(controllingNI.thstrm_amount);
-        if (v !== null) {
-          netIncomeForCheck = v;
-          netIncomeBasisNote = "연결 지배주주지분 당기순이익";
-        }
+      const totalNetIncomeItem = pickItem(items, EXACT_ALIASES.netIncome);
+      const controllingNI = pickControllingNetIncome(items, totalNetIncomeItem);
+      if (controllingNI && controllingNI.amount !== null) {
+        netIncomeForCheck = controllingNI.amount;
+        netIncomeBasisNote = `연결 지배주주지분 당기순이익 (${controllingNI.method})`;
       }
     }
 
