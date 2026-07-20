@@ -38,6 +38,29 @@ function pickItem(items, aliases) {
   return null;
 }
 
+// 시행령 제104조의24④1호: 연결재무제표 작성법인은 배당성향 산정 시 "지배회사 소유주지분
+// 당기순이익"을 분모로 써야 한다 (총 당기순이익이 아님) — pickItem()은 이 항목을 일부러
+// 제외하므로(EXCLUDE_SUBSTR), 별도 함수로 정확히 이 항목만 찾는다.
+const CONTROLLING_NI_ALIASES = [
+  "지배기업의 소유주에게 귀속되는 당기순이익",
+  "지배기업 소유주지분 당기순이익",
+  "지배기업의 소유주지분에 귀속되는 당기순이익",
+  "지배기업소유주지분당기순이익",
+  "지배기업의 소유주지분",
+];
+function pickControllingNetIncome(items) {
+  const pool = items.filter((it) => VALID_SJ.has(it.sj_div));
+  for (const alias of CONTROLLING_NI_ALIASES) {
+    const hit = pool.find((it) => (it.account_nm || "").trim() === alias);
+    if (hit) return hit;
+  }
+  for (const alias of CONTROLLING_NI_ALIASES) {
+    const hit = pool.find((it) => (it.account_nm || "").includes(alias));
+    if (hit) return hit;
+  }
+  return null;
+}
+
 function extractPeriods(items, aliases) {
   const it = pickItem(items, aliases);
   if (!it) return { thstrm: null, frmtrm: null, bfefrmtrm: null, accountNm: null };
@@ -193,22 +216,49 @@ async function getDividendData(apiKey, corpCode, year) {
   return { dividendByYear, payoutPctByYear };
 }
 
+// 시행령 제104조의24⑤: 배당성향 산정연도(직전사업연도)의 당기순이익(연결법인은 지배주주지분
+// 기준)이 0원 이하이면 배당성향을 100분의 25로 간주한다. 다만 부채총액이 자본총액의 2배를
+// 초과하는(자본잠식 포함) 고레버리지 법인은 배당성향을 0으로 간주한다.
+function applyNetLossOverride(reportedPayoutPct, netIncomeForCheck, totalEquityThis, totalLiabThis) {
+  if (netIncomeForCheck === null || netIncomeForCheck === undefined) {
+    return { payoutPct: reportedPayoutPct, overridden: false, reason: null, dataMissing: true };
+  }
+  if (netIncomeForCheck > 0) {
+    return { payoutPct: reportedPayoutPct, overridden: false, reason: null, dataMissing: false };
+  }
+  const haveLeverage = totalEquityThis !== null && totalEquityThis !== undefined && totalLiabThis !== null && totalLiabThis !== undefined;
+  const highLeverage = haveLeverage ? (totalEquityThis <= 0 || totalLiabThis > totalEquityThis * 2) : null;
+
+  if (highLeverage === true) {
+    return { payoutPct: 0, overridden: true, reason: "당기순손실 + 부채 자본 2배 초과(또는 자본잠식) → 배당성향 0%로 간주 (시행령 제104조의24⑤)", dataMissing: false };
+  }
+  if (highLeverage === false) {
+    return { payoutPct: 25, overridden: true, reason: "당기순손실 → 배당성향 25%로 간주 (시행령 제104조의24⑤)", dataMissing: false };
+  }
+  return { payoutPct: 25, overridden: true, reason: "당기순손실 → 배당성향 25%로 간주 (부채·자본 데이터 부족으로 고레버리지 예외는 미반영)", dataMissing: true };
+}
+
 // 조세특례제한법 제104조의27(고배당기업 주식 배당소득에 대한 과세특례), [본조신설 2025.12.23.]
+// + 시행령 제104조의24(2026.2.27. 본조신설)
 // 요건(모두 충족해야 "고배당기업"):
 //   ① 사업연도 종료일 현재 코스피·코스닥 상장법인일 것 (코넥스·투자회사 등 제외 - 이 도구는 미확인, 검색 대상이
 //      DART 상장기업 목록이므로 코넥스가 섞여 있을 수 있음)
 //   ② 직전 사업연도 배당소득이 2024년 12월 31일이 속하는 사업연도보다 감소하지 않았을 것
 //   ③ 가) 직전 사업연도 배당성향 40% 이상, 또는
 //      나) 직전 사업연도 배당성향 25% 이상 AND 이익배당금액이 전전 사업연도 대비 10% 이상 증가
-function computeTaxEligibility(year, dividendByYear, payoutPctByYear) {
+//   ※ 배당성향은 연결법인의 경우 지배주주지분 당기순이익 기준(시행령④), 당기순이익 0원 이하 시
+//      25%(고레버리지는 0%)로 간주(시행령⑤)
+function computeTaxEligibility(year, dividendByYear, payoutPctByYear, netIncomeForCheck, totalEquityThis, totalLiabThis) {
   const divThis = dividendByYear[year];           // 직전 사업연도 배당금 (예: 2025)
   const divBaseline2024 = dividendByYear[2024];    // 법조문상 고정 기준연도(2024년) 배당금
   const divOneYearAgo = dividendByYear[year - 1];  // 전전 사업연도 배당금 (예: 2024)
-  const payoutThis = payoutPctByYear[year];        // 직전 사업연도 배당성향(%)
+  const reportedPayout = payoutPctByYear[year];    // DART 공시 배당성향(%) — 시행령⑤ 반영 전 원본값
 
   const haveNonDecreaseData = divThis !== null && divThis !== undefined && divBaseline2024 !== null && divBaseline2024 !== undefined;
   const nonDecreasePass = haveNonDecreaseData ? divThis >= divBaseline2024 : null;
 
+  const override = applyNetLossOverride(reportedPayout, netIncomeForCheck, totalEquityThis, totalLiabThis);
+  const payoutThis = override.overridden ? override.payoutPct : reportedPayout;
   const havePayout = payoutThis !== null && payoutThis !== undefined;
   const payoutFrac = havePayout ? payoutThis / 100 : null;
 
@@ -219,6 +269,10 @@ function computeTaxEligibility(year, dividendByYear, payoutPctByYear) {
   const pass40 = havePayout ? payoutFrac >= 0.4 : null;
   const pass25Growth10 = (havePayout && growth !== null) ? (payoutFrac >= 0.25 && growth >= 0.10) : null;
   const condB = (pass40 === true || pass25Growth10 === true) ? true : (havePayout ? false : null);
+
+  const payoutDetailTxt = havePayout
+    ? (override.overridden ? `배당성향 ${payoutThis.toFixed(1)}% (시행령⑤ 간주, 원 공시값 ${reportedPayout === null || reportedPayout === undefined ? "N/A" : reportedPayout.toFixed(1) + "%"})` : `배당성향 ${payoutThis.toFixed(1)}%`)
+    : "배당성향 공시 없음";
 
   const conditions = [
     {
@@ -239,20 +293,23 @@ function computeTaxEligibility(year, dividendByYear, payoutPctByYear) {
       key: "payout40",
       label: "③-가 배당성향 40% 이상",
       pass: pass40,
-      detail: havePayout ? `배당성향 ${payoutThis.toFixed(1)}%` : "배당성향 공시 없음",
+      detail: payoutDetailTxt,
     },
     {
       key: "payout25Growth10",
       label: "③-나 배당성향 25% 이상 AND 전전사업연도 대비 10% 이상 증가",
       pass: pass25Growth10,
       detail: (havePayout && growth !== null)
-        ? `배당성향 ${payoutThis.toFixed(1)}%, 증가율 ${(growth * 100).toFixed(1)}%`
+        ? `${payoutDetailTxt}, 증가율 ${(growth * 100).toFixed(1)}%`
         : "배당성향 또는 전전사업연도 배당 데이터 부족",
     },
   ];
+  if (override.overridden) {
+    conditions.push({ key: "netLossOverride", label: "※ 시행령 제104조의24⑤ 당기순손실 간주규정 적용", pass: null, detail: override.reason });
+  }
 
   const growthTxt = growth !== null ? `${(growth * 100).toFixed(1)}%` : "N/A(자료부족)";
-  const payoutTxt = havePayout ? `${payoutThis.toFixed(1)}%` : "N/A";
+  const payoutTxt = havePayout ? `${payoutThis.toFixed(1)}%${override.overridden ? "(간주)" : ""}` : "N/A";
   const detail = `배당성향 ${payoutTxt} · 전전사업연도 대비 ${growthTxt}`;
 
   let status;
@@ -272,6 +329,8 @@ function computeTaxEligibility(year, dividendByYear, payoutPctByYear) {
     basis: {
       bsnsYear: year,
       payoutPct: payoutThis,
+      reportedPayoutPct: reportedPayout,
+      payoutOverridden: override.overridden,
       growthPct: growth !== null ? growth * 100 : null,
       dividendThis: divThis,
       dividendBaseline2024: divBaseline2024,
@@ -312,12 +371,35 @@ module.exports = async (req, res) => {
     const years = [year - 2, year - 1, year];
     const toSeries = (key) => [periods[key].bfefrmtrm, periods[key].frmtrm, periods[key].thstrm];
 
+    // 시행령 제104조의24④1호: 연결재무제표는 지배주주지분 당기순이익을 배당성향 분모로 써야 함.
+    // 못 찾으면 총 당기순이익으로 대체(근사치)하고 그 사실을 표시한다.
+    let netIncomeForCheck = periods.netIncome.thstrm;
+    let netIncomeBasisNote = fsDiv === "OFS" ? "별도재무제표 당기순이익" : "연결 총당기순이익(지배주주지분 항목 미확인, 근사치)";
+    if (fsDiv === "CFS") {
+      const controllingNI = pickControllingNetIncome(items);
+      if (controllingNI) {
+        const v = toNumber(controllingNI.thstrm_amount);
+        if (v !== null) {
+          netIncomeForCheck = v;
+          netIncomeBasisNote = "연결 지배주주지분 당기순이익";
+        }
+      }
+    }
+
     const stockCode = stockCodeFor(corpCode);
     const [{ dividendByYear, payoutPctByYear }, krx] = await Promise.all([
       getDividendData(apiKey, corpCode, year),
       checkKrxDisclosure(stockCode),
     ]);
-    const tax = computeTaxEligibility(year, dividendByYear, payoutPctByYear);
+    const tax = computeTaxEligibility(
+      year,
+      dividendByYear,
+      payoutPctByYear,
+      netIncomeForCheck,
+      periods.totalEquity.thstrm,
+      periods.totalLiab.thstrm
+    );
+    tax.basis.netIncomeBasis = netIncomeBasisNote;
 
     if (krx.found) {
       const ourPayout = tax.basis.payoutPct;
