@@ -365,7 +365,6 @@
   const loading = {};     // corp_code -> true while a fetch is in flight
   let selected = new Array(NUM_SLOTS).fill(null); // fixed-length: one corp_code (or null) per slot
   let colorIndex = 0;
-  let apiSearchBroken = false;
 
   // SEED는 화면에 칩으로 보여주지 않고, 검색 결과가 이 8개 기업과 일치할 때 네트워크 호출 없이
   // 바로 쓰기 위한 캐시 + /api가 응답하지 않을 때의 오프라인 검색 대상으로만 사용한다.
@@ -453,6 +452,7 @@
     let searchSeq = 0;
     let debounceTimer = null;
     let lastResults = [];
+    let lastWasFallback = false;
 
     function closeDropdown() {
       dropdown.hidden = true;
@@ -461,6 +461,7 @@
 
     function renderDropdownResults(results, isFallback) {
       lastResults = results;
+      lastWasFallback = isFallback;
       dropdown.innerHTML = "";
       if (isFallback) {
         const notice = document.createElement("div");
@@ -498,15 +499,14 @@
       input.setAttribute("aria-expanded", "true");
     }
 
+    // 매 검색마다 실시간 API를 새로 시도한다 — 한 번 실패했다고 이후 검색까지 영구적으로
+    // 오프라인 모드로 고정하지 않는다(일시적 네트워크 오류였을 수 있으므로). 이미 새로운
+    // 입력으로 대체된(stale) 요청의 실패는 결과 반영 없이 조용히 무시한다.
     async function runSearch(query) {
       const q = query.trim();
       if (!q) { closeDropdown(); return; }
       const seq = ++searchSeq;
 
-      if (apiSearchBroken) {
-        renderDropdownResults(localFallbackMatch(q), true);
-        return;
-      }
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
         if (!res.ok) throw new Error("search api error");
@@ -514,8 +514,7 @@
         if (seq !== searchSeq) return; // stale response, a newer keystroke superseded it
         renderDropdownResults(list.map((c) => ({ code: c.code, name: c.name, stock: c.stock })), false);
       } catch (err) {
-        apiSearchBroken = true;
-        if (seq !== searchSeq) return;
+        if (seq !== searchSeq) return; // stale failure — a newer request already superseded this one
         renderDropdownResults(localFallbackMatch(q), true);
       }
     }
@@ -529,10 +528,10 @@
     input.addEventListener("keydown", (e) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        if (lastResults.length) { hlIndex = Math.min(hlIndex + 1, lastResults.length - 1); renderDropdownResults(lastResults, apiSearchBroken); }
+        if (lastResults.length) { hlIndex = Math.min(hlIndex + 1, lastResults.length - 1); renderDropdownResults(lastResults, lastWasFallback); }
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        if (lastResults.length) { hlIndex = Math.max(hlIndex - 1, 0); renderDropdownResults(lastResults, apiSearchBroken); }
+        if (lastResults.length) { hlIndex = Math.max(hlIndex - 1, 0); renderDropdownResults(lastResults, lastWasFallback); }
       } else if (e.key === "Enter") {
         e.preventDefault();
         const pick = lastResults[hlIndex] || lastResults[0];
