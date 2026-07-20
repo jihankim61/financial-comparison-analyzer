@@ -94,15 +94,15 @@
   .source-badge { display: flex; align-items: center; gap: 6px; font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; background: var(--surface); white-space: nowrap; }
   .source-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pos); flex: none; }
 
-  /* company selector */
-  .selector-panel { margin-bottom: 20px; padding: 14px 14px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
-  .selector-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-family: "JetBrains Mono", monospace; margin-right: 4px; white-space: nowrap; }
+  /* company selector: 3 fixed slots, each an independent search box */
+  .selector-panel { margin-bottom: 20px; padding: 14px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .slot-row { display: flex; flex-direction: column; gap: 10px; }
+  .company-slot { display: flex; align-items: center; gap: 10px; }
+  .slot-number { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-strong); font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 
-  .search-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
   .search-input-wrap { position: relative; flex: 1; max-width: 380px; }
   .search-input { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface-raised); color: var(--ink); font-size: 13px; font-family: inherit; }
   .search-input:focus-visible, .search-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
-  .search-hint { font-size: 11.5px; color: var(--muted); }
   .search-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 10px; box-shadow: var(--shadow); z-index: 30; max-height: 220px; overflow-y: auto; }
   .search-item { padding: 8px 12px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--ink); }
   .search-item .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
@@ -110,14 +110,14 @@
   .search-item.disabled { opacity: 0.4; cursor: not-allowed; }
   .search-empty { padding: 10px 12px; font-size: 12.5px; color: var(--muted); }
 
-  .chip-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .chip-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border-strong); background: var(--chip-off-bg); color: var(--chip-off-fg); font-size: 13px; font-weight: 600; cursor: pointer; user-select: none; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
-  .chip-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .chip-toggle .dot { width: 9px; height: 9px; border-radius: 50%; background: currentColor; opacity: 0.35; }
-  .chip-toggle.active { background: var(--dot-color, var(--accent)); color: #fff; border-color: transparent; }
-  .chip-toggle.active .dot { background: #fff; opacity: 1; }
-  .chip-toggle:disabled { opacity: 0.35; cursor: not-allowed; }
-  .selector-count { margin-left: auto; font-size: 12px; color: var(--muted); font-family: "JetBrains Mono", monospace; }
+  .slot-filled { display: flex; align-items: center; gap: 8px; flex: 1; max-width: 380px; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface-raised); }
+  .slot-filled .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dot-color); flex: none; }
+  .slot-filled .slot-name { flex: 1; font-weight: 600; font-size: 13px; }
+  .slot-filled.loading { color: var(--muted); }
+  .slot-clear { flex: none; border: none; background: none; color: var(--muted); cursor: pointer; font-size: 13px; line-height: 1; padding: 3px 5px; border-radius: 4px; }
+  .slot-clear:hover { background: var(--neg-soft); color: var(--neg); }
+  .slot-clear:focus-visible { outline: 2px solid var(--accent); }
+  .kpi-empty-hint { grid-column: 1 / -1; padding: 24px; text-align: center; color: var(--muted); font-size: 13px; border: 1px dashed var(--border); border-radius: 12px; }
 
   /* KPI cards */
   .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 22px; }
@@ -208,7 +208,6 @@
   .kpi-card.loading .kpi-rows { opacity: 0.4; }
   .kpi-card.loading .kpi-name::after { content: "불러오는 중…"; font-size: 11px; font-weight: 400; color: var(--muted); }
   tr.loading-row td { color: var(--muted); font-style: italic; }
-  .chip-toggle.loading { opacity: 0.6; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--border-strong); border-top-color: var(--accent); display: inline-block; animation: spin 0.7s linear infinite; }
   @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
@@ -225,24 +224,13 @@
   <div class="dash-header">
     <div>
       <h1 class="dash-title">재무비교분석기 대시보드</h1>
-      <p class="dash-sub">DART Open API로 국내 상장기업 전체(3,976개)를 검색해 비교하세요 (최대 5개)</p>
+      <p class="dash-sub">DART Open API로 국내 상장기업 전체(3,976개)를 검색해 비교하세요 — 회사 3곳을 입력하면 바로 분석됩니다</p>
     </div>
     <div class="source-badge"><span class="source-dot"></span>DART 최신 사업보고서 · 실시간 조회</div>
   </div>
 
   <div class="selector-panel">
-    <div class="search-row">
-      <span class="selector-label">회사 검색</span>
-      <div class="search-input-wrap">
-        <input type="text" id="companySearch" class="search-input" placeholder="회사명을 입력하세요 (예: 네이버, 카카오, 포스코...)" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" />
-        <div class="search-dropdown" id="searchDropdown" hidden></div>
-      </div>
-      <span class="search-hint">입력 후 Enter 또는 클릭으로 추가</span>
-    </div>
-    <div class="chip-row" id="selectorBar">
-      <span class="selector-label">빠른 선택</span>
-      <span class="selector-count" id="selCount"></span>
-    </div>
+    <div class="slot-row" id="slotRow"></div>
   </div>
 
   <div class="status-msg" id="statusMsg" hidden></div>
@@ -286,7 +274,6 @@
 
 <script>
 (function () {
-  const MAX_SELECT = 5;
   const catVar = (i) => `var(--cat-${(i % 8) + 1})`;
 
   // ---- seed data (instant load, also used as offline fallback if /api isn't deployed) ----
@@ -373,16 +360,18 @@
       tax: {status:"unknown"} }],
   ];
 
+  const NUM_SLOTS = 3;
   const cache = {};       // corp_code -> data object (with .name, .code, ._color)
   const loading = {};     // corp_code -> true while a fetch is in flight
-  let selected = [];
+  let selected = new Array(NUM_SLOTS).fill(null); // fixed-length: one corp_code (or null) per slot
   let colorIndex = 0;
   let apiSearchBroken = false;
 
+  // SEED는 화면에 칩으로 보여주지 않고, 검색 결과가 이 8개 기업과 일치할 때 네트워크 호출 없이
+  // 바로 쓰기 위한 캐시 + /api가 응답하지 않을 때의 오프라인 검색 대상으로만 사용한다.
   SEED.forEach(([code, name, data]) => {
     cache[code] = Object.assign({ name, code, _color: catVar(colorIndex++) }, data);
   });
-  selected = ["00126380", "00164779", "00159193"]; // 삼성전자, SK하이닉스, 한국전력
 
   // ---- helpers ----
   const fmtWon = (v) => {
@@ -426,9 +415,9 @@
     return data;
   }
 
-  async function selectCompany(code, name) {
-    if (selected.includes(code) || selected.length >= MAX_SELECT) return;
-    selected.push(code);
+  async function selectCompanyForSlot(slotIndex, code, name) {
+    if (selected.includes(code)) return; // 이미 다른 칸에 선택된 회사
+    selected[slotIndex] = code;
     clearStatus();
     if (!cache[code]) {
       loading[code] = true;
@@ -437,7 +426,7 @@
         const data = await fetchCompany(code, name);
         cache[code] = Object.assign({ name: name || data.name, code, _color: catVar(colorIndex++) }, data);
       } catch (err) {
-        selected = selected.filter((c) => c !== code);
+        selected[slotIndex] = null;
         showStatus("error", `${name || code}: ${err.message}`);
       } finally {
         delete loading[code];
@@ -448,41 +437,9 @@
     }
   }
 
-  function deselectCompany(code) {
-    selected = selected.filter((c) => c !== code);
+  function clearSlot(slotIndex) {
+    selected[slotIndex] = null;
     renderAll();
-  }
-
-  // ---- quick-select chips (the 8 seed companies) ----
-  const bar = document.getElementById("selectorBar");
-  const countEl = document.getElementById("selCount");
-  function renderSelector() {
-    bar.querySelectorAll(".chip-toggle").forEach((el) => el.remove());
-    SEED.forEach(([code, name]) => {
-      const chip = document.createElement("button");
-      chip.type = "button";
-      const isSel = selected.includes(code);
-      chip.className = "chip-toggle" + (isSel ? " active" : "") + (loading[code] ? " loading" : "");
-      chip.style.setProperty("--dot-color", cache[code]._color);
-      chip.innerHTML = `<span class="dot"></span>${name}`;
-      chip.disabled = !isSel && selected.length >= MAX_SELECT;
-      chip.addEventListener("click", () => (isSel ? deselectCompany(code) : selectCompany(code, name)));
-      bar.appendChild(chip);
-    });
-    bar.appendChild(countEl);
-    countEl.textContent = `${selected.length} / ${MAX_SELECT} 선택됨`;
-  }
-
-  // ---- live search / direct text entry ----
-  const searchInput = document.getElementById("companySearch");
-  const dropdown = document.getElementById("searchDropdown");
-  let hlIndex = -1;
-  let searchSeq = 0;
-  let debounceTimer = null;
-
-  function closeDropdown() {
-    dropdown.hidden = true;
-    searchInput.setAttribute("aria-expanded", "false");
   }
 
   function localFallbackMatch(q) {
@@ -490,99 +447,156 @@
     return SEED.filter(([, name]) => name.toLowerCase().includes(ql)).map(([code, name]) => ({ code, name }));
   }
 
-  async function runSearch(query) {
-    const q = query.trim();
-    if (!q) { closeDropdown(); return; }
-    const seq = ++searchSeq;
+  // ---- 슬롯 1개(검색창+드롭다운)에 대한 독립적인 검색 동작을 붙인다 ----
+  function wireSlotSearch(input, dropdown, slotIndex) {
+    let hlIndex = -1;
+    let searchSeq = 0;
+    let debounceTimer = null;
+    let lastResults = [];
 
-    if (apiSearchBroken) {
-      renderDropdownResults(localFallbackMatch(q), true);
-      return;
+    function closeDropdown() {
+      dropdown.hidden = true;
+      input.setAttribute("aria-expanded", "false");
     }
-    try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
-      if (!res.ok) throw new Error("search api error");
-      const list = await res.json();
-      if (seq !== searchSeq) return; // stale response, a newer keystroke superseded it
-      renderDropdownResults(list.map((c) => ({ code: c.code, name: c.name, stock: c.stock })), false);
-    } catch (err) {
-      apiSearchBroken = true;
-      if (seq !== searchSeq) return;
-      renderDropdownResults(localFallbackMatch(q), true);
-    }
-  }
 
-  function renderDropdownResults(results, isFallback) {
-    dropdown.innerHTML = "";
-    if (isFallback) {
-      const notice = document.createElement("div");
-      notice.className = "search-empty";
-      notice.textContent = "실시간 검색 연결 안 됨 — 8개 기본 기업 중에서만 검색됩니다";
-      dropdown.appendChild(notice);
-    }
-    if (results.length === 0) {
-      const div = document.createElement("div");
-      div.className = "search-empty";
-      div.textContent = "일치하는 기업이 없습니다";
-      dropdown.appendChild(div);
-      dropdown.hidden = false;
-      searchInput.setAttribute("aria-expanded", "true");
-      return;
-    }
-    results.forEach((r, i) => {
-      const already = selected.includes(r.code);
-      const full = !already && selected.length >= MAX_SELECT;
-      const item = document.createElement("div");
-      item.className = "search-item" + (already || full ? " disabled" : "") + (i === hlIndex ? " hl" : "");
-      item.setAttribute("role", "option");
-      const swatchColor = cache[r.code] ? cache[r.code]._color : "var(--muted)";
-      item.innerHTML = `<span class="dot" style="background:${swatchColor}"></span>${r.name}${r.stock ? `<span class="sub">${r.stock}</span>` : ""}${already ? " · 선택됨" : ""}`;
-      item.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-        if (already || full) return;
-        searchInput.value = "";
-        hlIndex = -1;
-        closeDropdown();
-        selectCompany(r.code, r.name);
-        searchInput.focus();
-      });
-      dropdown.appendChild(item);
-    });
-    dropdown.hidden = false;
-    searchInput.setAttribute("aria-expanded", "true");
-    window._lastSearchResults = results;
-  }
-
-  searchInput.addEventListener("input", () => {
-    hlIndex = -1;
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => runSearch(searchInput.value), 220);
-  });
-  searchInput.addEventListener("focus", () => { if (searchInput.value.trim()) runSearch(searchInput.value); });
-  searchInput.addEventListener("keydown", (e) => {
-    const results = window._lastSearchResults || [];
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      if (results.length) { hlIndex = Math.min(hlIndex + 1, results.length - 1); renderDropdownResults(results, apiSearchBroken); }
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      if (results.length) { hlIndex = Math.max(hlIndex - 1, 0); renderDropdownResults(results, apiSearchBroken); }
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      const pick = results[hlIndex] || results[0];
-      if (pick && !selected.includes(pick.code) && selected.length < MAX_SELECT) {
-        searchInput.value = "";
-        hlIndex = -1;
-        closeDropdown();
-        selectCompany(pick.code, pick.name);
+    function renderDropdownResults(results, isFallback) {
+      lastResults = results;
+      dropdown.innerHTML = "";
+      if (isFallback) {
+        const notice = document.createElement("div");
+        notice.className = "search-empty";
+        notice.textContent = "실시간 검색 연결 안 됨 — 8개 기본 기업 중에서만 검색됩니다";
+        dropdown.appendChild(notice);
       }
-    } else if (e.key === "Escape") {
-      closeDropdown();
+      if (results.length === 0) {
+        const div = document.createElement("div");
+        div.className = "search-empty";
+        div.textContent = "일치하는 기업이 없습니다";
+        dropdown.appendChild(div);
+        dropdown.hidden = false;
+        input.setAttribute("aria-expanded", "true");
+        return;
+      }
+      results.forEach((r, i) => {
+        const already = selected.includes(r.code);
+        const item = document.createElement("div");
+        item.className = "search-item" + (already ? " disabled" : "") + (i === hlIndex ? " hl" : "");
+        item.setAttribute("role", "option");
+        const swatchColor = cache[r.code] ? cache[r.code]._color : "var(--muted)";
+        item.innerHTML = `<span class="dot" style="background:${swatchColor}"></span>${r.name}${r.stock ? `<span class="sub">${r.stock}</span>` : ""}${already ? " · 다른 칸에 선택됨" : ""}`;
+        item.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          if (already) return;
+          input.value = "";
+          hlIndex = -1;
+          closeDropdown();
+          selectCompanyForSlot(slotIndex, r.code, r.name);
+        });
+        dropdown.appendChild(item);
+      });
+      dropdown.hidden = false;
+      input.setAttribute("aria-expanded", "true");
     }
-  });
+
+    async function runSearch(query) {
+      const q = query.trim();
+      if (!q) { closeDropdown(); return; }
+      const seq = ++searchSeq;
+
+      if (apiSearchBroken) {
+        renderDropdownResults(localFallbackMatch(q), true);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+        if (!res.ok) throw new Error("search api error");
+        const list = await res.json();
+        if (seq !== searchSeq) return; // stale response, a newer keystroke superseded it
+        renderDropdownResults(list.map((c) => ({ code: c.code, name: c.name, stock: c.stock })), false);
+      } catch (err) {
+        apiSearchBroken = true;
+        if (seq !== searchSeq) return;
+        renderDropdownResults(localFallbackMatch(q), true);
+      }
+    }
+
+    input.addEventListener("input", () => {
+      hlIndex = -1;
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => runSearch(input.value), 220);
+    });
+    input.addEventListener("focus", () => { if (input.value.trim()) runSearch(input.value); });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (lastResults.length) { hlIndex = Math.min(hlIndex + 1, lastResults.length - 1); renderDropdownResults(lastResults, apiSearchBroken); }
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (lastResults.length) { hlIndex = Math.max(hlIndex - 1, 0); renderDropdownResults(lastResults, apiSearchBroken); }
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        const pick = lastResults[hlIndex] || lastResults[0];
+        if (pick && !selected.includes(pick.code)) {
+          input.value = "";
+          hlIndex = -1;
+          closeDropdown();
+          selectCompanyForSlot(slotIndex, pick.code, pick.name);
+        }
+      } else if (e.key === "Escape") {
+        closeDropdown();
+      }
+    });
+  }
+
+  // 슬롯은 매 렌더마다 새로 만들어지므로(container.innerHTML = ""), 바깥 클릭 시 드롭다운을
+  // 닫는 리스너는 슬롯별로 달지 않고 document에 한 번만 등록해 모든 열린 드롭다운을 검사한다.
   document.addEventListener("click", (e) => {
-    if (!e.target.closest(".search-input-wrap")) closeDropdown();
+    document.querySelectorAll(".search-input-wrap").forEach((wrap) => {
+      if (!wrap.contains(e.target)) {
+        const dd = wrap.querySelector(".search-dropdown");
+        if (dd) dd.hidden = true;
+      }
+    });
   });
+
+  // ---- 3개 슬롯 렌더링 ----
+  function renderSlots() {
+    const container = document.getElementById("slotRow");
+    container.innerHTML = "";
+    for (let i = 0; i < NUM_SLOTS; i++) {
+      const code = selected[i];
+      const slot = document.createElement("div");
+      slot.className = "company-slot";
+      if (code && cache[code]) {
+        const d = cache[code];
+        slot.innerHTML = `
+          <span class="slot-number">${i + 1}</span>
+          <div class="slot-filled" style="--dot-color:${d._color}">
+            <span class="dot"></span><span class="slot-name">${d.name}</span>
+            <button type="button" class="slot-clear" aria-label="${d.name} 선택 해제">✕</button>
+          </div>
+        `;
+        slot.querySelector(".slot-clear").addEventListener("click", () => clearSlot(i));
+      } else if (code && loading[code]) {
+        slot.innerHTML = `
+          <span class="slot-number">${i + 1}</span>
+          <div class="slot-filled loading"><span class="spinner"></span>&nbsp;조회 중…</div>
+        `;
+      } else {
+        slot.innerHTML = `
+          <span class="slot-number">${i + 1}</span>
+          <div class="search-input-wrap">
+            <input type="text" class="search-input" placeholder="회사명을 입력하세요 (예: 네이버, 카카오, 포스코...)" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" />
+            <div class="search-dropdown" hidden></div>
+          </div>
+        `;
+        const input = slot.querySelector(".search-input");
+        const dropdown = slot.querySelector(".search-dropdown");
+        wireSlotSearch(input, dropdown, i);
+      }
+      container.appendChild(slot);
+    }
+  }
 
   // ---- 분리과세 요건 상세 breakdown + KRX 교차검증 ----
   function taxClassLabel(status) {
@@ -639,7 +653,12 @@
   function renderKpi() {
     const grid = document.getElementById("kpiGrid");
     grid.innerHTML = "";
+    if (selected.every((c) => !c)) {
+      grid.innerHTML = `<div class="kpi-empty-hint">위에서 회사 3곳을 검색해 선택하면 비교 결과가 여기에 표시됩니다.</div>`;
+      return;
+    }
     selected.forEach((code) => {
+      if (!code) return;
       const isLoading = !!loading[code];
       const d = cache[code];
       const card = document.createElement("div");
@@ -803,7 +822,7 @@
   }
 
   function renderAll() {
-    renderSelector();
+    renderSlots();
     renderKpi();
     drawLineChart("chartRevenue", "legendRevenue", "revenue");
     drawLineChart("chartOpIncome", "legendOpIncome", "opIncome");
